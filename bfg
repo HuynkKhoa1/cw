@@ -9,12 +9,12 @@ local Lighting         = game:GetService("Lighting")
 local LocalPlayer = Players.LocalPlayer
 
 local Library = {
-    Version          = "5.0.0",
+    Version          = "6.0.0",
     Flags            = {},
     Options          = {},
     Windows          = {},
     Theme            = nil,
-    CurrentThemeName = "Dark",
+    CurrentThemeName = "Galaxy",
     ToggleKey        = Enum.KeyCode.RightShift,
     ConfigFolder     = "KoaUI",
     Connections      = {},
@@ -89,268 +89,111 @@ local function buildTheme(d)
 end
 
 Library.Themes = {
-    Dark = buildTheme({
-        Name = "Dark", Accent = Color3.fromRGB(96, 205, 255),
-        AcrylicMain = Color3.fromRGB(60, 60, 60), AcrylicBorder = Color3.fromRGB(90, 90, 90),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(40, 40, 40), Color3.fromRGB(40, 40, 40)),
-        AcrylicNoise = 0.9, Element = Color3.fromRGB(120, 120, 120), ElementBorder = Color3.fromRGB(35, 35, 35),
-        DropdownHolder = Color3.fromRGB(45, 45, 45), ElementTransparency = 0.87,
-        Text = Color3.fromRGB(240, 240, 240), SubText = Color3.fromRGB(170, 170, 170), Hover = Color3.fromRGB(140, 140, 140),
-    }),
-    Darker = buildTheme({
-        Name = "Darker", Accent = Color3.fromRGB(56, 109, 223),
-        AcrylicMain = Color3.fromRGB(30, 30, 30), AcrylicBorder = Color3.fromRGB(60, 60, 60),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(17, 17, 17), Color3.fromRGB(18, 18, 18)),
-        AcrylicNoise = 0.94, Element = Color3.fromRGB(70, 70, 70), ElementBorder = Color3.fromRGB(25, 25, 25),
-        DropdownHolder = Color3.fromRGB(35, 35, 35), ElementTransparency = 0.82,
-        Text = Color3.fromRGB(240, 240, 240), SubText = Color3.fromRGB(170, 170, 170), Hover = Color3.fromRGB(90, 90, 90),
-    }),
-    AMOLED = buildTheme({
-        Name = "AMOLED", Accent = Color3.fromRGB(255, 255, 255),
-        AcrylicMain = Color3.fromRGB(0, 0, 0), AcrylicBorder = Color3.fromRGB(20, 20, 20),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(0, 0, 0), Color3.fromRGB(0, 0, 0)),
-        AcrylicNoise = 1, Element = Color3.fromRGB(15, 15, 15), ElementBorder = Color3.fromRGB(0, 0, 0),
-        DropdownHolder = Color3.fromRGB(0, 0, 0), ElementTransparency = 0.95,
-        Text = Color3.fromRGB(255, 255, 255), SubText = Color3.fromRGB(170, 170, 170), Hover = Color3.fromRGB(40, 40, 40),
-        AccentText = Color3.fromRGB(15, 15, 15),
-    }),
-    Light = buildTheme({
-        Name = "Light", Accent = Color3.fromRGB(0, 103, 192),
-        AcrylicMain = Color3.fromRGB(200, 200, 200), AcrylicBorder = Color3.fromRGB(120, 120, 120),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(255, 255, 255)),
-        AcrylicNoise = 0.96, Element = Color3.fromRGB(255, 255, 255), ElementBorder = Color3.fromRGB(180, 180, 180),
-        DropdownHolder = Color3.fromRGB(240, 240, 240), ElementTransparency = 0.65,
-        Text = Color3.fromRGB(0, 0, 0), SubText = Color3.fromRGB(40, 40, 40), Hover = Color3.fromRGB(225, 225, 225),
-    }),
-    Balloon = buildTheme({
-        Name = "Balloon", Accent = Color3.fromRGB(100, 170, 255),
-        AcrylicMain = Color3.fromRGB(189, 224, 255), AcrylicBorder = Color3.fromRGB(160, 227, 255),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(240, 250, 255), Color3.fromRGB(210, 235, 250)),
-        AcrylicNoise = 1, Element = Color3.fromRGB(160, 200, 255), ElementBorder = Color3.fromRGB(130, 170, 230),
-        DropdownHolder = Color3.fromRGB(200, 220, 240), ElementTransparency = 0.80,
-        Text = Color3.fromRGB(30, 30, 30), SubText = Color3.fromRGB(90, 90, 90), Hover = Color3.fromRGB(170, 220, 255),
-        AccentText = Color3.fromRGB(20, 30, 50),
-    }),
-    SoftCream = buildTheme({
-        Name = "SoftCream", Accent = Color3.fromRGB(206, 163, 90),
-        AcrylicMain = Color3.fromRGB(255, 245, 220), AcrylicBorder = Color3.fromRGB(255, 230, 200),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(255, 245, 220), Color3.fromRGB(255, 235, 210)),
-        AcrylicNoise = 0.93, Element = Color3.fromRGB(255, 216, 161), ElementBorder = Color3.fromRGB(234, 193, 111),
-        DropdownHolder = Color3.fromRGB(250, 240, 225), ElementTransparency = 0.80,
-        Text = Color3.fromRGB(30, 30, 30), SubText = Color3.fromRGB(90, 90, 90), Hover = Color3.fromRGB(255, 220, 190),
-        AccentText = Color3.fromRGB(40, 30, 10),
-    }),
-    Aqua = buildTheme({
-        Name = "Aqua", Accent = Color3.fromRGB(38, 166, 178),
-        AcrylicMain = Color3.fromRGB(18, 54, 61), AcrylicBorder = Color3.fromRGB(80, 118, 130),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(41, 101, 139), Color3.fromRGB(11, 132, 128)),
-        AcrylicNoise = 0.92, Element = Color3.fromRGB(66, 130, 160), ElementBorder = Color3.fromRGB(40, 100, 122),
-        DropdownHolder = Color3.fromRGB(39, 99, 116), ElementTransparency = 0.87,
-        Text = Color3.fromRGB(240, 240, 240), SubText = Color3.fromRGB(170, 170, 170), Hover = Color3.fromRGB(112, 155, 160),
-    }),
-    Amethyst = buildTheme({
-        Name = "Amethyst", Accent = Color3.fromRGB(126, 44, 182),
-        AcrylicMain = Color3.fromRGB(40, 12, 71), AcrylicBorder = Color3.fromRGB(85, 45, 120),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(34, 19, 49), Color3.fromRGB(41, 24, 57)),
-        AcrylicNoise = 0.92, Element = Color3.fromRGB(115, 55, 150), ElementBorder = Color3.fromRGB(60, 35, 85),
-        DropdownHolder = Color3.fromRGB(50, 30, 70), ElementTransparency = 0.87,
-        Text = Color3.fromRGB(240, 240, 240), SubText = Color3.fromRGB(170, 170, 170), Hover = Color3.fromRGB(135, 65, 160),
-    }),
-    Rose = buildTheme({
-        Name = "Rose", Accent = Color3.fromRGB(219, 48, 123),
-        AcrylicMain = Color3.fromRGB(35, 25, 30), AcrylicBorder = Color3.fromRGB(145, 35, 75),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(65, 25, 45), Color3.fromRGB(75, 30, 50)),
-        AcrylicNoise = 0.92, Element = Color3.fromRGB(170, 60, 90), ElementBorder = Color3.fromRGB(95, 35, 55),
-        DropdownHolder = Color3.fromRGB(75, 30, 45), ElementTransparency = 0.87,
-        Text = Color3.fromRGB(240, 240, 240), SubText = Color3.fromRGB(170, 170, 170), Hover = Color3.fromRGB(190, 75, 105),
-    }),
-    Midnight = buildTheme({
-        Name = "Midnight", Accent = Color3.fromRGB(52, 50, 178),
-        AcrylicMain = Color3.fromRGB(20, 20, 20), AcrylicBorder = Color3.fromRGB(83, 83, 130),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(1, 1, 39), Color3.fromRGB(6, 6, 54)),
-        AcrylicNoise = 0.96, Element = Color3.fromRGB(111, 108, 160), ElementBorder = Color3.fromRGB(32, 32, 59),
-        DropdownHolder = Color3.fromRGB(35, 36, 80), ElementTransparency = 0.87,
-        Text = Color3.fromRGB(240, 240, 240), SubText = Color3.fromRGB(170, 170, 170), Hover = Color3.fromRGB(119, 121, 160),
-    }),
-    Forest = buildTheme({
-        Name = "Forest", Accent = Color3.fromRGB(46, 141, 70),
-        AcrylicMain = Color3.fromRGB(20, 35, 25), AcrylicBorder = Color3.fromRGB(50, 90, 60),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(15, 35, 20), Color3.fromRGB(20, 40, 25)),
-        AcrylicNoise = 0.92, Element = Color3.fromRGB(70, 120, 80), ElementBorder = Color3.fromRGB(30, 50, 35),
-        DropdownHolder = Color3.fromRGB(35, 60, 40), ElementTransparency = 0.87,
-        Text = Color3.fromRGB(240, 240, 240), SubText = Color3.fromRGB(170, 170, 170), Hover = Color3.fromRGB(90, 150, 100),
-    }),
-    Sunset = buildTheme({
-        Name = "Sunset", Accent = Color3.fromRGB(255, 128, 0),
-        AcrylicMain = Color3.fromRGB(40, 25, 25), AcrylicBorder = Color3.fromRGB(130, 80, 60),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(70, 35, 20), Color3.fromRGB(60, 30, 20)),
-        AcrylicNoise = 0.92, Element = Color3.fromRGB(160, 100, 70), ElementBorder = Color3.fromRGB(70, 40, 30),
-        DropdownHolder = Color3.fromRGB(60, 35, 25), ElementTransparency = 0.87,
-        Text = Color3.fromRGB(240, 240, 240), SubText = Color3.fromRGB(170, 170, 170), Hover = Color3.fromRGB(180, 110, 80),
-    }),
-    Ocean = buildTheme({
-        Name = "Ocean", Accent = Color3.fromRGB(0, 141, 255),
-        AcrylicMain = Color3.fromRGB(20, 25, 40), AcrylicBorder = Color3.fromRGB(40, 60, 100),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(15, 25, 45), Color3.fromRGB(20, 30, 50)),
-        AcrylicNoise = 0.92, Element = Color3.fromRGB(60, 80, 140), ElementBorder = Color3.fromRGB(30, 40, 70),
-        DropdownHolder = Color3.fromRGB(25, 35, 60), ElementTransparency = 0.87,
-        Text = Color3.fromRGB(240, 240, 240), SubText = Color3.fromRGB(170, 170, 170), Hover = Color3.fromRGB(80, 100, 170),
-    }),
-    Emerald = buildTheme({
-        Name = "Emerald", Accent = Color3.fromRGB(0, 168, 107),
-        AcrylicMain = Color3.fromRGB(20, 35, 30), AcrylicBorder = Color3.fromRGB(30, 100, 80),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(20, 55, 45), Color3.fromRGB(25, 60, 50)),
-        AcrylicNoise = 0.92, Element = Color3.fromRGB(40, 120, 95), ElementBorder = Color3.fromRGB(25, 75, 60),
-        DropdownHolder = Color3.fromRGB(20, 70, 55), ElementTransparency = 0.87,
-        Text = Color3.fromRGB(240, 240, 240), SubText = Color3.fromRGB(170, 170, 170), Hover = Color3.fromRGB(45, 130, 100),
-    }),
-    Sapphire = buildTheme({
-        Name = "Sapphire", Accent = Color3.fromRGB(0, 105, 255),
-        AcrylicMain = Color3.fromRGB(24, 30, 85), AcrylicBorder = Color3.fromRGB(25, 80, 150),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(13, 33, 94), Color3.fromRGB(21, 44, 127)),
-        AcrylicNoise = 0.88, Element = Color3.fromRGB(42, 98, 176), ElementBorder = Color3.fromRGB(23, 66, 113),
-        DropdownHolder = Color3.fromRGB(15, 60, 100), ElementTransparency = 0.85,
-        Text = Color3.fromRGB(240, 240, 240), SubText = Color3.fromRGB(170, 170, 170), Hover = Color3.fromRGB(50, 140, 210),
-    }),
-    Cloud = buildTheme({
-        Name = "Cloud", Accent = Color3.fromRGB(27, 114, 138),
-        AcrylicMain = Color3.fromRGB(13, 62, 77), AcrylicBorder = Color3.fromRGB(80, 118, 130),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(51, 74, 83), Color3.fromRGB(4, 47, 66)),
-        AcrylicNoise = 0.94, Element = Color3.fromRGB(66, 130, 160), ElementBorder = Color3.fromRGB(40, 100, 122),
-        DropdownHolder = Color3.fromRGB(39, 99, 116), ElementTransparency = 0.87,
-        Text = Color3.fromRGB(209, 240, 233), SubText = Color3.fromRGB(170, 170, 170), Hover = Color3.fromRGB(112, 155, 160),
-    }),
-    Grape = buildTheme({
-        Name = "Grape", Accent = Color3.fromRGB(183, 176, 223),
-        AcrylicMain = Color3.fromRGB(0, 0, 0), AcrylicBorder = Color3.fromRGB(20, 20, 20),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(6, 0, 16), Color3.fromRGB(6, 0, 16)),
-        AcrylicNoise = 1, Element = Color3.fromRGB(15, 15, 15), ElementBorder = Color3.fromRGB(6, 0, 16),
-        DropdownHolder = Color3.fromRGB(12, 0, 34), ElementTransparency = 0.95,
-        Text = Color3.fromRGB(255, 255, 255), SubText = Color3.fromRGB(123, 144, 170), Hover = Color3.fromRGB(40, 40, 40),
-        AccentText = Color3.fromRGB(20, 15, 35),
-    }),
-    Bloody = buildTheme({
-        Name = "Bloody", Accent = Color3.fromRGB(144, 0, 0),
-        AcrylicMain = Color3.fromRGB(61, 0, 0), AcrylicBorder = Color3.fromRGB(86, 0, 0),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(90, 0, 0), Color3.fromRGB(100, 0, 0)),
-        AcrylicNoise = 0.92, Element = Color3.fromRGB(156, 0, 0), ElementBorder = Color3.fromRGB(91, 0, 0),
-        DropdownHolder = Color3.fromRGB(79, 0, 0), ElementTransparency = 0.86,
-        Text = Color3.fromRGB(240, 240, 240), SubText = Color3.fromRGB(131, 131, 131), Hover = Color3.fromRGB(181, 0, 0),
-    }),
-    Arctic = buildTheme({
-        Name = "Arctic", Accent = Color3.fromRGB(64, 224, 255),
-        AcrylicMain = Color3.fromRGB(10, 18, 25), AcrylicBorder = Color3.fromRGB(35, 55, 70),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(15, 25, 35), Color3.fromRGB(18, 30, 40)),
-        AcrylicNoise = 0.94, Element = Color3.fromRGB(60, 95, 120), ElementBorder = Color3.fromRGB(60, 95, 120),
-        DropdownHolder = Color3.fromRGB(30, 45, 60), ElementTransparency = 0.88,
-        Text = Color3.fromRGB(240, 250, 255), SubText = Color3.fromRGB(180, 200, 220), Hover = Color3.fromRGB(90, 140, 180),
-        AccentText = Color3.fromRGB(10, 18, 25),
-    }),
-    -- ── Custom pack: galaxy / chill ─────────────────────────
+    -- KoaUI v6 · 10 hand-tuned themes · galaxy & chill pack
     Galaxy = buildTheme({
         -- deep space violet, starlight lavender accent
-        Name = "Galaxy", Accent = Color3.fromRGB(170, 148, 255),
-        AcrylicMain = Color3.fromRGB(16, 12, 38), AcrylicBorder = Color3.fromRGB(74, 60, 130),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(10, 6, 28), Color3.fromRGB(38, 18, 64)),
-        AcrylicNoise = 0.93, Element = Color3.fromRGB(98, 80, 170), ElementBorder = Color3.fromRGB(50, 38, 96),
-        DropdownHolder = Color3.fromRGB(24, 18, 52), ElementTransparency = 0.86,
-        Text = Color3.fromRGB(236, 233, 250), SubText = Color3.fromRGB(158, 150, 196), Hover = Color3.fromRGB(122, 102, 200),
-        AccentText = Color3.fromRGB(14, 10, 32),
+        Name = "Galaxy", Accent = Color3.fromRGB(172, 148, 255),
+        AcrylicMain = Color3.fromRGB(13, 10, 32), AcrylicBorder = Color3.fromRGB(88, 70, 160),
+        AcrylicGradient = ColorSequence.new(Color3.fromRGB(16, 10, 42), Color3.fromRGB(54, 24, 92)),
+        AcrylicNoise = 0.93, Element = Color3.fromRGB(104, 84, 182), ElementBorder = Color3.fromRGB(54, 42, 104),
+        DropdownHolder = Color3.fromRGB(26, 20, 56), ElementTransparency = 0.84,
+        Text = Color3.fromRGB(238, 235, 252), SubText = Color3.fromRGB(162, 154, 200), Hover = Color3.fromRGB(128, 106, 210),
+        AccentText = Color3.fromRGB(16, 10, 36),
     }),
     Nebula = buildTheme({
-        -- magenta dust drifting into teal void
-        Name = "Nebula", Accent = Color3.fromRGB(255, 110, 199),
-        AcrylicMain = Color3.fromRGB(24, 10, 36), AcrylicBorder = Color3.fromRGB(110, 45, 120),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(30, 8, 48), Color3.fromRGB(8, 28, 52)),
-        AcrylicNoise = 0.92, Element = Color3.fromRGB(140, 60, 140), ElementBorder = Color3.fromRGB(70, 30, 80),
-        DropdownHolder = Color3.fromRGB(36, 16, 52), ElementTransparency = 0.86,
-        Text = Color3.fromRGB(248, 238, 250), SubText = Color3.fromRGB(176, 152, 188), Hover = Color3.fromRGB(170, 80, 160),
-        AccentText = Color3.fromRGB(40, 8, 30),
+        -- magenta dust drifting into a teal void
+        Name = "Nebula", Accent = Color3.fromRGB(255, 118, 202),
+        AcrylicMain = Color3.fromRGB(20, 8, 32), AcrylicBorder = Color3.fromRGB(132, 52, 138),
+        AcrylicGradient = ColorSequence.new(Color3.fromRGB(44, 10, 66), Color3.fromRGB(10, 36, 66)),
+        AcrylicNoise = 0.92, Element = Color3.fromRGB(152, 64, 148), ElementBorder = Color3.fromRGB(78, 32, 88),
+        DropdownHolder = Color3.fromRGB(40, 16, 58), ElementTransparency = 0.84,
+        Text = Color3.fromRGB(250, 240, 252), SubText = Color3.fromRGB(182, 156, 194), Hover = Color3.fromRGB(182, 86, 170),
+        AccentText = Color3.fromRGB(44, 8, 32),
     }),
     Aurora = buildTheme({
-        -- polar night sky, green light curtain
-        Name = "Aurora", Accent = Color3.fromRGB(96, 245, 178),
-        AcrylicMain = Color3.fromRGB(8, 18, 30), AcrylicBorder = Color3.fromRGB(40, 90, 85),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(6, 14, 30), Color3.fromRGB(10, 44, 42)),
-        AcrylicNoise = 0.94, Element = Color3.fromRGB(50, 120, 105), ElementBorder = Color3.fromRGB(25, 65, 60),
-        DropdownHolder = Color3.fromRGB(14, 34, 38), ElementTransparency = 0.87,
-        Text = Color3.fromRGB(230, 246, 240), SubText = Color3.fromRGB(148, 178, 170), Hover = Color3.fromRGB(70, 150, 130),
-        AccentText = Color3.fromRGB(6, 24, 20),
+        -- polar night, green light curtain
+        Name = "Aurora", Accent = Color3.fromRGB(92, 246, 178),
+        AcrylicMain = Color3.fromRGB(6, 16, 26), AcrylicBorder = Color3.fromRGB(44, 104, 94),
+        AcrylicGradient = ColorSequence.new(Color3.fromRGB(6, 14, 32), Color3.fromRGB(8, 52, 48)),
+        AcrylicNoise = 0.94, Element = Color3.fromRGB(52, 128, 110), ElementBorder = Color3.fromRGB(26, 70, 62),
+        DropdownHolder = Color3.fromRGB(12, 36, 40), ElementTransparency = 0.85,
+        Text = Color3.fromRGB(230, 248, 242), SubText = Color3.fromRGB(146, 180, 170), Hover = Color3.fromRGB(72, 158, 136),
+        AccentText = Color3.fromRGB(4, 26, 20),
     }),
     Moonlight = buildTheme({
-        -- calm silver-blue, almost no color
-        Name = "Moonlight", Accent = Color3.fromRGB(196, 211, 235),
-        AcrylicMain = Color3.fromRGB(22, 26, 34), AcrylicBorder = Color3.fromRGB(70, 78, 95),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(24, 28, 38), Color3.fromRGB(32, 38, 52)),
-        AcrylicNoise = 0.95, Element = Color3.fromRGB(96, 106, 128), ElementBorder = Color3.fromRGB(52, 58, 72),
-        DropdownHolder = Color3.fromRGB(32, 37, 48), ElementTransparency = 0.87,
-        Text = Color3.fromRGB(235, 240, 248), SubText = Color3.fromRGB(160, 170, 188), Hover = Color3.fromRGB(120, 132, 158),
-        AccentText = Color3.fromRGB(24, 28, 40),
+        -- calm silver-blue, quiet at 2am
+        Name = "Moonlight", Accent = Color3.fromRGB(198, 214, 240),
+        AcrylicMain = Color3.fromRGB(20, 24, 32), AcrylicBorder = Color3.fromRGB(76, 84, 102),
+        AcrylicGradient = ColorSequence.new(Color3.fromRGB(22, 26, 36), Color3.fromRGB(36, 42, 58)),
+        AcrylicNoise = 0.95, Element = Color3.fromRGB(98, 108, 132), ElementBorder = Color3.fromRGB(54, 60, 76),
+        DropdownHolder = Color3.fromRGB(30, 35, 46), ElementTransparency = 0.85,
+        Text = Color3.fromRGB(236, 241, 250), SubText = Color3.fromRGB(160, 170, 190), Hover = Color3.fromRGB(122, 134, 160),
+        AccentText = Color3.fromRGB(22, 26, 38),
     }),
     Lofi = buildTheme({
-        -- warm dusk room, peach lamp glow, a bit of tape grain
-        Name = "Lofi", Accent = Color3.fromRGB(255, 170, 128),
-        AcrylicMain = Color3.fromRGB(38, 30, 36), AcrylicBorder = Color3.fromRGB(95, 72, 78),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(44, 32, 40), Color3.fromRGB(58, 40, 44)),
-        AcrylicNoise = 0.90, Element = Color3.fromRGB(130, 96, 96), ElementBorder = Color3.fromRGB(70, 52, 56),
-        DropdownHolder = Color3.fromRGB(52, 40, 46), ElementTransparency = 0.86,
-        Text = Color3.fromRGB(244, 234, 226), SubText = Color3.fromRGB(178, 158, 152), Hover = Color3.fromRGB(158, 116, 110),
-        AccentText = Color3.fromRGB(46, 28, 22),
+        -- warm dusk room, peach lamp glow, tape grain
+        Name = "Lofi", Accent = Color3.fromRGB(255, 172, 128),
+        AcrylicMain = Color3.fromRGB(34, 26, 32), AcrylicBorder = Color3.fromRGB(104, 78, 82),
+        AcrylicGradient = ColorSequence.new(Color3.fromRGB(42, 30, 38), Color3.fromRGB(66, 44, 46)),
+        AcrylicNoise = 0.88, Element = Color3.fromRGB(138, 100, 98), ElementBorder = Color3.fromRGB(76, 56, 60),
+        DropdownHolder = Color3.fromRGB(50, 38, 44), ElementTransparency = 0.84,
+        Text = Color3.fromRGB(246, 236, 228), SubText = Color3.fromRGB(182, 160, 154), Hover = Color3.fromRGB(164, 120, 112),
+        AccentText = Color3.fromRGB(48, 28, 20),
     }),
     SakuraNight = buildTheme({
-        -- slate night with blossom pink
-        Name = "SakuraNight", Accent = Color3.fromRGB(255, 158, 184),
-        AcrylicMain = Color3.fromRGB(24, 22, 36), AcrylicBorder = Color3.fromRGB(110, 70, 100),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(28, 24, 44), Color3.fromRGB(52, 32, 54)),
-        AcrylicNoise = 0.93, Element = Color3.fromRGB(140, 90, 120), ElementBorder = Color3.fromRGB(72, 48, 70),
-        DropdownHolder = Color3.fromRGB(38, 32, 54), ElementTransparency = 0.86,
-        Text = Color3.fromRGB(246, 238, 244), SubText = Color3.fromRGB(174, 158, 178), Hover = Color3.fromRGB(170, 110, 140),
-        AccentText = Color3.fromRGB(52, 22, 36),
+        -- slate night with cherry blossom pink
+        Name = "SakuraNight", Accent = Color3.fromRGB(255, 160, 186),
+        AcrylicMain = Color3.fromRGB(22, 20, 34), AcrylicBorder = Color3.fromRGB(122, 76, 108),
+        AcrylicGradient = ColorSequence.new(Color3.fromRGB(26, 22, 42), Color3.fromRGB(60, 34, 60)),
+        AcrylicNoise = 0.93, Element = Color3.fromRGB(148, 94, 126), ElementBorder = Color3.fromRGB(78, 52, 76),
+        DropdownHolder = Color3.fromRGB(36, 30, 52), ElementTransparency = 0.84,
+        Text = Color3.fromRGB(248, 240, 246), SubText = Color3.fromRGB(178, 160, 182), Hover = Color3.fromRGB(178, 114, 146),
+        AccentText = Color3.fromRGB(54, 22, 38),
     }),
     Vaporwave = buildTheme({
-        -- retro dusk: purple haze fading to teal, hot pink accent
-        Name = "Vaporwave", Accent = Color3.fromRGB(255, 113, 206),
-        AcrylicMain = Color3.fromRGB(26, 16, 48), AcrylicBorder = Color3.fromRGB(90, 60, 150),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(34, 16, 64), Color3.fromRGB(12, 40, 76)),
-        AcrylicNoise = 0.91, Element = Color3.fromRGB(110, 80, 180), ElementBorder = Color3.fromRGB(60, 40, 110),
-        DropdownHolder = Color3.fromRGB(34, 24, 66), ElementTransparency = 0.86,
-        Text = Color3.fromRGB(240, 240, 255), SubText = Color3.fromRGB(160, 158, 205), Hover = Color3.fromRGB(130, 100, 210),
-        AccentText = Color3.fromRGB(40, 10, 40), Info = Color3.fromRGB(1, 205, 254),
+        -- retro dusk: purple haze into teal, hot pink accent
+        Name = "Vaporwave", Accent = Color3.fromRGB(255, 116, 208),
+        AcrylicMain = Color3.fromRGB(22, 14, 44), AcrylicBorder = Color3.fromRGB(102, 66, 168),
+        AcrylicGradient = ColorSequence.new(Color3.fromRGB(40, 16, 76), Color3.fromRGB(10, 44, 86)),
+        AcrylicNoise = 0.91, Element = Color3.fromRGB(118, 86, 192), ElementBorder = Color3.fromRGB(64, 44, 118),
+        DropdownHolder = Color3.fromRGB(32, 22, 64), ElementTransparency = 0.84,
+        Text = Color3.fromRGB(242, 242, 255), SubText = Color3.fromRGB(164, 160, 210), Hover = Color3.fromRGB(138, 106, 218),
+        AccentText = Color3.fromRGB(42, 10, 42), Info = Color3.fromRGB(1, 205, 254),
     }),
     Matcha = buildTheme({
-        -- chill light theme: milky matcha, warm paper
-        Name = "Matcha", Accent = Color3.fromRGB(108, 142, 88),
-        AcrylicMain = Color3.fromRGB(235, 238, 222), AcrylicBorder = Color3.fromRGB(180, 190, 160),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(244, 246, 232), Color3.fromRGB(226, 232, 210)),
-        AcrylicNoise = 0.95, Element = Color3.fromRGB(205, 216, 182), ElementBorder = Color3.fromRGB(168, 182, 144),
-        DropdownHolder = Color3.fromRGB(228, 233, 214), ElementTransparency = 0.70,
-        Text = Color3.fromRGB(44, 52, 38), SubText = Color3.fromRGB(104, 114, 92), Hover = Color3.fromRGB(214, 224, 194),
-        AccentText = Color3.fromRGB(245, 248, 238),
+        -- the one light theme: milky matcha, warm paper
+        Name = "Matcha", Accent = Color3.fromRGB(104, 138, 84),
+        AcrylicMain = Color3.fromRGB(238, 240, 226), AcrylicBorder = Color3.fromRGB(176, 186, 156),
+        AcrylicGradient = ColorSequence.new(Color3.fromRGB(246, 248, 236), Color3.fromRGB(224, 230, 206)),
+        AcrylicNoise = 0.95, Element = Color3.fromRGB(200, 212, 176), ElementBorder = Color3.fromRGB(164, 178, 140),
+        DropdownHolder = Color3.fromRGB(230, 234, 216), ElementTransparency = 0.55,
+        Text = Color3.fromRGB(42, 50, 36), SubText = Color3.fromRGB(100, 110, 88), Hover = Color3.fromRGB(212, 222, 190),
+        AccentText = Color3.fromRGB(246, 249, 240),
     }),
     Ember = buildTheme({
-        -- cozy fireplace: dark coffee, amber glow
-        Name = "Ember", Accent = Color3.fromRGB(255, 156, 84),
-        AcrylicMain = Color3.fromRGB(32, 22, 18), AcrylicBorder = Color3.fromRGB(96, 62, 44),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(38, 24, 18), Color3.fromRGB(58, 32, 22)),
-        AcrylicNoise = 0.90, Element = Color3.fromRGB(140, 88, 60), ElementBorder = Color3.fromRGB(74, 46, 34),
-        DropdownHolder = Color3.fromRGB(48, 32, 24), ElementTransparency = 0.86,
-        Text = Color3.fromRGB(246, 236, 226), SubText = Color3.fromRGB(180, 156, 140), Hover = Color3.fromRGB(168, 108, 76),
-        AccentText = Color3.fromRGB(44, 22, 10),
+        -- fireplace: dark coffee, amber glow
+        Name = "Ember", Accent = Color3.fromRGB(255, 158, 86),
+        AcrylicMain = Color3.fromRGB(28, 19, 15), AcrylicBorder = Color3.fromRGB(106, 68, 46),
+        AcrylicGradient = ColorSequence.new(Color3.fromRGB(36, 22, 16), Color3.fromRGB(70, 38, 24)),
+        AcrylicNoise = 0.88, Element = Color3.fromRGB(148, 92, 60), ElementBorder = Color3.fromRGB(80, 50, 36),
+        DropdownHolder = Color3.fromRGB(46, 30, 22), ElementTransparency = 0.84,
+        Text = Color3.fromRGB(248, 238, 228), SubText = Color3.fromRGB(184, 158, 140), Hover = Color3.fromRGB(176, 112, 78),
+        AccentText = Color3.fromRGB(46, 22, 8),
     }),
     Velvet = buildTheme({
-        -- deep wine velvet with champagne gold accent
-        Name = "Velvet", Accent = Color3.fromRGB(216, 180, 130),
-        AcrylicMain = Color3.fromRGB(30, 14, 22), AcrylicBorder = Color3.fromRGB(96, 48, 64),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(36, 14, 26), Color3.fromRGB(52, 20, 34)),
-        AcrylicNoise = 0.92, Element = Color3.fromRGB(130, 66, 90), ElementBorder = Color3.fromRGB(72, 36, 50),
-        DropdownHolder = Color3.fromRGB(44, 22, 32), ElementTransparency = 0.86,
-        Text = Color3.fromRGB(244, 234, 236), SubText = Color3.fromRGB(180, 156, 164), Hover = Color3.fromRGB(158, 84, 110),
-        AccentText = Color3.fromRGB(40, 22, 12),
+        -- deep wine velvet, champagne gold accent
+        Name = "Velvet", Accent = Color3.fromRGB(220, 184, 132),
+        AcrylicMain = Color3.fromRGB(26, 12, 20), AcrylicBorder = Color3.fromRGB(108, 52, 70),
+        AcrylicGradient = ColorSequence.new(Color3.fromRGB(38, 14, 28), Color3.fromRGB(62, 22, 40)),
+        AcrylicNoise = 0.92, Element = Color3.fromRGB(138, 70, 94), ElementBorder = Color3.fromRGB(78, 38, 54),
+        DropdownHolder = Color3.fromRGB(42, 20, 32), ElementTransparency = 0.84,
+        Text = Color3.fromRGB(246, 236, 238), SubText = Color3.fromRGB(184, 158, 166), Hover = Color3.fromRGB(166, 88, 114),
+        AccentText = Color3.fromRGB(42, 22, 12),
     }),
 }
 
-Library.Theme = Library.Themes.Ocean
-Library.CurrentThemeName = "Ocean"
+Library.Theme = Library.Themes.Galaxy
+Library.CurrentThemeName = "Galaxy"
 
 Library.Icons = {
     home     = "rbxassetid://10723407389",
@@ -546,7 +389,7 @@ local function acrylicGlass(parent, radius, zbase)
     local bg = new("Frame", {
         Name = "Background",
         BackgroundColor3 = Library.Theme.AcrylicMain,
-        BackgroundTransparency = Library._seeThrough and 0.78 or 0.45,
+        BackgroundTransparency = Library._seeThrough and 0.72 or 0.25,
         Size = UDim2.fromScale(1, 1),
         BorderSizePixel = 0,
         ZIndex = zbase,
@@ -558,7 +401,7 @@ local function acrylicGlass(parent, radius, zbase)
 
     local grad = new("Frame", {
         BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-        BackgroundTransparency = 0.4,
+        BackgroundTransparency = 0.3,
         Size = UDim2.fromScale(1, 1),
         BorderSizePixel = 0,
         ZIndex = zbase,
@@ -740,22 +583,24 @@ function Library:Notify(opts)
         ZIndex = 801,
         Parent = NotifHolder,
     })
-    local glass = acrylicGlass(card, 10, 801)
+    local glass = acrylicGlass(card, 12, 801)
     glass.BackgroundTransparency = 1
     tween(glass, 0.3, { BackgroundTransparency = 0.9 })
 
-    new("Frame", {
+    local notifBar = new("Frame", {
         BackgroundColor3 = accent,
-        Position = UDim2.new(0, 0, 0, 0),
-        Size = UDim2.new(0, 3, 1, 0),
+        AnchorPoint = Vector2.new(0, 0.5),
+        Position = UDim2.new(0, 8, 0.5, 0),
+        Size = UDim2.new(0, 3, 1, -24),
         BorderSizePixel = 0,
         ZIndex = 805,
         Parent = card,
     })
+    corner(notifBar, 999)
 
     new("ImageLabel", {
         BackgroundTransparency = 1,
-        Position = UDim2.new(0, 14, 0, 13),
+        Position = UDim2.new(0, 18, 0, 13),
         Size = UDim2.new(0, 18, 0, 18),
         Image = iconId,
         ImageColor3 = accent,
@@ -765,8 +610,8 @@ function Library:Notify(opts)
 
     local holder = new("Frame", {
         BackgroundTransparency = 1,
-        Position = UDim2.new(0, 42, 0, 0),
-        Size = UDim2.new(1, -56, 0, 0),
+        Position = UDim2.new(0, 46, 0, 0),
+        Size = UDim2.new(1, -60, 0, 0),
         AutomaticSize = Enum.AutomaticSize.Y,
         ZIndex = 805,
         Parent = card,
@@ -871,7 +716,7 @@ function Library:_ShowTooltip(text)
         ZIndex = 901,
         Parent = TooltipHolder,
     })
-    corner(tip, 6)
+    corner(tip, 8)
     stroke(tip, 0.7)
     padding(tip, 6, 6, 10, 10)
     new("TextLabel", {
@@ -902,7 +747,7 @@ function Library:CreateStatus(opts)
         Name = "Status",
         AnchorPoint = Vector2.new(0.5, 0),
         Position = opts.Position or UDim2.new(0.5, 0, 0, 12),
-        Size = UDim2.new(0, opts.Width or 156, 0, 30),
+        Size = UDim2.new(0, opts.Width or 156, 0, 32),
         BackgroundColor3 = Library.Theme.AcrylicMain,
         BackgroundTransparency = 0.2,
         AutoButtonColor = false,
@@ -910,7 +755,7 @@ function Library:CreateStatus(opts)
         ZIndex = 650,
         Parent = ScreenGui,
     })
-    corner(pill, 8)
+    corner(pill, 999)
     local pStroke = new("UIStroke", {
         Color = accentColor(),
         Transparency = 0.4,
@@ -1034,7 +879,7 @@ function Library:CreateReopenButton(opts)
         ZIndex = 650,
         Parent = ScreenGui,
     })
-    corner(btn, 8)
+    corner(btn, 10)
     local rStroke = new("UIStroke", {
         Color = accentColor(),
         Transparency = 0.4,
@@ -1277,7 +1122,7 @@ function Library:EnableBlur(enabled)
     Library._blurEnabled = enabled
     Library._seeThrough = enabled and true or false
     if Library._queueSave then Library._queueSave() end
-    local target = enabled and 0.78 or 0.45
+    local target = enabled and 0.72 or 0.25
     for _, bg in ipairs(Library._acrylicBgs) do
         if bg and bg.Parent then
             tween(bg, 0.25, { BackgroundTransparency = target })
@@ -1383,7 +1228,7 @@ function Library:Dialog(opts)
         ZIndex = 951,
         Parent = overlay,
     })
-    acrylicGlass(box, 12, 951)
+    acrylicGlass(box, 14, 951)
     padding(box, 18, 16, 18, 18)
     vlist(box, 10)
 
@@ -1453,7 +1298,7 @@ function Library:Dialog(opts)
             ClipsDescendants = true,
             Parent = btnRow,
         })
-        corner(btn, 8)
+        corner(btn, 10)
         stroke(btn, 0.7)
         ripple(btn, btn)
         track(btn.MouseButton1Click:Connect(function()
@@ -1473,8 +1318,8 @@ local function elementBase(parent, height)
         BorderSizePixel = 0,
         Parent = parent,
     })
-    corner(frame, 8)
-    local s = stroke(frame, 0.6)
+    corner(frame, 10)
+    local s = stroke(frame, 0.55)
     bindTheme(frame, function(t) return { BackgroundColor3 = t.Surface, BackgroundTransparency = t.ElementTransparency } end)
     bindTheme(s, function(t) return { Color = t.Stroke } end)
     return frame
@@ -1605,26 +1450,26 @@ function Elements:Toggle(opts)
     local pill = new("Frame", {
         AnchorPoint = Vector2.new(1, 0.5),
         Position = UDim2.new(1, -14, 0.5, 0),
-        Size = UDim2.new(0, 42, 0, 22),
+        Size = UDim2.new(0, 46, 0, 24),
         BackgroundColor3 = Library.Theme.Disabled,
         BorderSizePixel = 0,
         ZIndex = 2,
         Parent = frame,
     })
-    corner(pill, 11)
+    corner(pill, 12)
     local pillStroke = stroke(pill, 0.5)
     bindTheme(pillStroke, function(t) return { Color = t.Stroke } end)
 
     local knob = new("Frame", {
         AnchorPoint = Vector2.new(0, 0.5),
         Position = UDim2.new(0, 3, 0.5, 0),
-        Size = UDim2.new(0, 16, 0, 16),
+        Size = UDim2.new(0, 18, 0, 18),
         BackgroundColor3 = Color3.fromRGB(255, 255, 255),
         BorderSizePixel = 0,
         ZIndex = 3,
         Parent = pill,
     })
-    corner(knob, 8)
+    corner(knob, 9)
 
     local btn = new("TextButton", {
         BackgroundTransparency = 1,
@@ -1638,7 +1483,7 @@ function Elements:Toggle(opts)
     local function visual()
         if state then
             tween(pill, SPEED, { BackgroundColor3 = accentColor() })
-            tween(knob, SPEED, { Position = UDim2.new(1, -19, 0.5, 0) })
+            tween(knob, SPEED, { Position = UDim2.new(1, -21, 0.5, 0) })
         else
             tween(pill, SPEED, { BackgroundColor3 = Library.Theme.Disabled })
             tween(knob, SPEED, { Position = UDim2.new(0, 3, 0.5, 0) })
@@ -1710,13 +1555,13 @@ function Elements:Slider(opts)
 
     local barBack = new("Frame", {
         Position = UDim2.new(0, 14, 1, -18),
-        Size = UDim2.new(1, -28, 0, 6),
+        Size = UDim2.new(1, -28, 0, 8),
         BackgroundColor3 = Library.Theme.Inset,
         BorderSizePixel = 0,
         ZIndex = 2,
         Parent = frame,
     })
-    corner(barBack, 3)
+    corner(barBack, 4)
     bindTheme(barBack, function(t) return { BackgroundColor3 = t.Inset } end)
 
     local barFill = new("Frame", {
@@ -1726,19 +1571,19 @@ function Elements:Slider(opts)
         ZIndex = 3,
         Parent = barBack,
     })
-    corner(barFill, 3)
+    corner(barFill, 4)
     bindTheme(barFill, function() return { BackgroundColor3 = accentColor() } end)
 
     local knob = new("Frame", {
         AnchorPoint = Vector2.new(0.5, 0.5),
         Position = UDim2.new(1, 0, 0.5, 0),
-        Size = UDim2.new(0, 12, 0, 12),
+        Size = UDim2.new(0, 14, 0, 14),
         BackgroundColor3 = Color3.fromRGB(255, 255, 255),
         BorderSizePixel = 0,
         ZIndex = 4,
         Parent = barFill,
     })
-    corner(knob, 6)
+    corner(knob, 7)
 
     local object = {}
     local function round(v)
@@ -1771,7 +1616,7 @@ function Elements:Slider(opts)
         if input.UserInputType == Enum.UserInputType.MouseButton1
             or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
-            tween(knob, 0.1, { Size = UDim2.new(0, 16, 0, 16) })
+            tween(knob, 0.1, { Size = UDim2.new(0, 18, 0, 18) })
             update(input)
         end
     end))
@@ -1784,7 +1629,7 @@ function Elements:Slider(opts)
     track(UserInputService.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1
             or input.UserInputType == Enum.UserInputType.Touch then
-            if dragging then tween(knob, 0.1, { Size = UDim2.new(0, 12, 0, 12) }) end
+            if dragging then tween(knob, 0.1, { Size = UDim2.new(0, 14, 0, 14) }) end
             dragging = false
         end
     end))
@@ -1900,7 +1745,7 @@ function Elements:Dropdown(opts)
             ZIndex = 520,
             Parent = PopupLayer,
         })
-        acrylicGlass(popup, 8, 520)
+        acrylicGlass(popup, 10, 520)
 
         local inner = new("Frame", {
             BackgroundTransparency = 1,
@@ -1920,7 +1765,7 @@ function Elements:Dropdown(opts)
                 ZIndex = 524,
                 Parent = inner,
             })
-            corner(searchWrap, 7)
+            corner(searchWrap, 8)
             bindTheme(searchWrap, function(t) return { BackgroundColor3 = t.Inset } end)
             searchBox = new("TextBox", {
                 BackgroundTransparency = 1,
@@ -1963,7 +1808,7 @@ function Elements:Dropdown(opts)
                 ZIndex = 525,
                 Parent = listContainer,
             })
-            corner(optFrame, 7)
+            corner(optFrame, 8)
             local optLabel = new("TextLabel", {
                 BackgroundTransparency = 1,
                 Position = UDim2.new(0, 10, 0, 0),
@@ -2164,7 +2009,7 @@ function Elements:Input(opts)
         ZIndex = 2,
         Parent = frame,
     })
-    corner(boxWrap, 7)
+    corner(boxWrap, 8)
     local boxStroke = stroke(boxWrap, 0.6)
     bindTheme(boxWrap, function(t) return { BackgroundColor3 = t.Inset } end)
     bindTheme(boxStroke, function(t) return { Color = t.Stroke } end)
@@ -2235,7 +2080,7 @@ function Elements:Keybind(opts)
         ZIndex = 2,
         Parent = frame,
     })
-    corner(keyBtn, 7)
+    corner(keyBtn, 8)
     local keyStroke = stroke(keyBtn, 0.6)
     bindTheme(keyBtn, function(t) return { BackgroundColor3 = t.Inset, TextColor3 = t.Text } end)
     bindTheme(keyStroke, function(t) return { Color = t.Stroke } end)
@@ -2683,13 +2528,13 @@ function Elements:Progress(opts)
 
     local barBack = new("Frame", {
         Position = UDim2.new(0, 14, 1, -16),
-        Size = UDim2.new(1, -28, 0, 6),
+        Size = UDim2.new(1, -28, 0, 8),
         BackgroundColor3 = Library.Theme.Inset,
         BorderSizePixel = 0,
         ZIndex = 2,
         Parent = frame,
     })
-    corner(barBack, 3)
+    corner(barBack, 4)
     bindTheme(barBack, function(t) return { BackgroundColor3 = t.Inset } end)
 
     local barFill = new("Frame", {
@@ -2699,7 +2544,7 @@ function Elements:Progress(opts)
         ZIndex = 3,
         Parent = barBack,
     })
-    corner(barFill, 3)
+    corner(barFill, 4)
     bindTheme(barFill, function() return { BackgroundColor3 = accentColor() } end)
 
     local object = {}
@@ -2735,7 +2580,7 @@ function Elements:Stepper(opts)
         ZIndex = 2,
         Parent = frame,
     })
-    corner(holder, 7)
+    corner(holder, 8)
     bindTheme(holder, function(t) return { BackgroundColor3 = t.Inset } end)
 
     local minus = new("TextButton", {
@@ -3015,7 +2860,7 @@ function Library:CreateWindow(opts)
     opts = opts or {}
     local windowObj = { Tabs = {} }
 
-    local size = opts.Size or UDim2.new(0, 640, 0, 460)
+    local size = opts.Size or UDim2.new(0, 680, 0, 480)
     local minSize = opts.MinSize or Vector2.new(460, 320)
     local offset = #Library.Windows * 28
 
@@ -3031,12 +2876,12 @@ function Library:CreateWindow(opts)
         Visible = not Library._hidden,
         Parent = ScreenGui,
     })
-    corner(root, 12)
-    acrylicGlass(root, 12, 1)
+    corner(root, 16)
+    acrylicGlass(root, 16, 1)
     windowObj.Root = root
 
     local topbar = new("Frame", {
-        Size = UDim2.new(1, 0, 0, 44),
+        Size = UDim2.new(1, 0, 0, 50),
         BackgroundTransparency = 1,
         ZIndex = 5,
         Parent = root,
@@ -3053,7 +2898,18 @@ function Library:CreateWindow(opts)
     bindTheme(topStroke, function(t) return { BackgroundColor3 = t.Stroke } end)
     makeDraggable(topbar, root)
 
-    local titleX = 16
+    local titleX = 30
+    local titleDot = new("Frame", {
+        AnchorPoint = Vector2.new(0, 0.5),
+        Position = UDim2.new(0, 16, 0.5, 0),
+        Size = UDim2.new(0, 7, 0, 7),
+        BackgroundColor3 = accentColor(),
+        BorderSizePixel = 0,
+        ZIndex = 6,
+        Parent = topbar,
+    })
+    corner(titleDot, 999)
+    bindTheme(titleDot, function() return { BackgroundColor3 = accentColor() } end)
     if opts.Icon then
         local icon = new("ImageLabel", {
             BackgroundTransparency = 1,
@@ -3066,7 +2922,8 @@ function Library:CreateWindow(opts)
             Parent = topbar,
         })
         bindTheme(icon, function() return { ImageColor3 = accentColor() } end)
-        titleX = 42
+        titleX = 46
+        titleDot.Visible = false
     end
 
     local titleLabel = new("TextLabel", {
@@ -3116,7 +2973,7 @@ function Library:CreateWindow(opts)
             ZIndex = 6,
             Parent = topbar,
         })
-        corner(searchWrap, 8)
+        corner(searchWrap, 999)
         local ssz = stroke(searchWrap, 0.6)
         bindTheme(searchWrap, function(t) return { BackgroundColor3 = t.Inset } end)
         bindTheme(ssz, function(t) return { Color = t.Stroke } end)
@@ -3153,7 +3010,7 @@ function Library:CreateWindow(opts)
         local b = new("TextButton", {
             AnchorPoint = Vector2.new(1, 0.5),
             Position = UDim2.new(1, xOff, 0.5, 0),
-            Size = UDim2.new(0, 26, 0, 26),
+            Size = UDim2.new(0, 28, 0, 28),
             BackgroundColor3 = Library.Theme.Inset,
             BackgroundTransparency = 0.4,
             Text = "",
@@ -3161,7 +3018,7 @@ function Library:CreateWindow(opts)
             ZIndex = 6,
             Parent = topbar,
         })
-        corner(b, 7)
+        corner(b, 999)
         bindTheme(b, function(t) return { BackgroundColor3 = t.Inset } end)
         local img = new("ImageLabel", {
             BackgroundTransparency = 1,
@@ -3187,15 +3044,15 @@ function Library:CreateWindow(opts)
     end
 
     local body = new("Frame", {
-        Position = UDim2.new(0, 0, 0, 44),
-        Size = UDim2.new(1, 0, 1, -44),
+        Position = UDim2.new(0, 0, 0, 50),
+        Size = UDim2.new(1, 0, 1, -50),
         BackgroundTransparency = 1,
         ZIndex = 4,
         Parent = root,
     })
 
     local sidebar = new("Frame", {
-        Size = UDim2.new(0, 162, 1, 0),
+        Size = UDim2.new(0, 170, 1, 0),
         BackgroundTransparency = 1,
         ZIndex = 4,
         Parent = body,
@@ -3226,8 +3083,8 @@ function Library:CreateWindow(opts)
     vlist(tabList, 5)
 
     local content = new("Frame", {
-        Position = UDim2.new(0, 162, 0, 0),
-        Size = UDim2.new(1, -162, 1, 0),
+        Position = UDim2.new(0, 170, 0, 0),
+        Size = UDim2.new(1, -170, 1, 0),
         BackgroundTransparency = 1,
         ClipsDescendants = true,
         ZIndex = 4,
@@ -3285,7 +3142,7 @@ function Library:CreateWindow(opts)
         if minimized then
             body.Visible = false
             resizeHandle.Visible = false
-            tween(root, SPEED, { Size = UDim2.new(0, size.X.Offset, 0, 44) })
+            tween(root, SPEED, { Size = UDim2.new(0, size.X.Offset, 0, 50) })
         else
             tween(root, SPEED, { Size = size })
             resizeHandle.Visible = true
@@ -3347,7 +3204,7 @@ function Library:CreateWindow(opts)
         local name = tabOpts.Title or ("Tab " .. (#windowObj.Tabs + 1))
 
         local tabBtn = new("TextButton", {
-            Size = UDim2.new(1, 0, 0, 34),
+            Size = UDim2.new(1, 0, 0, 36),
             BackgroundColor3 = Library.Theme.Surface,
             BackgroundTransparency = 1,
             Text = "",
@@ -3355,7 +3212,7 @@ function Library:CreateWindow(opts)
             ZIndex = 4,
             Parent = tabList,
         })
-        corner(tabBtn, 8)
+        corner(tabBtn, 10)
         bindTheme(tabBtn, function(t) return { BackgroundColor3 = t.Surface } end)
 
         local indicator = new("Frame", {
@@ -3413,7 +3270,7 @@ function Library:CreateWindow(opts)
             Parent = content,
         })
         padding(page, 14, 16, 14, 14)
-        vlist(page, 9)
+        vlist(page, 10)
 
         windowObj._tabButtons[name] = { Frame = tabBtn, Label = tabLabel, Indicator = indicator, Icon = iconImg }
         windowObj._tabPages[name] = page
