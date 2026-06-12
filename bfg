@@ -1784,7 +1784,7 @@ function Elements:Dropdown(opts)
     })
     hoverFill(frame)
 
-    local popup, modal, listContainer, listLayout, searchBox
+    local popup, listContainer, listLayout, searchBox
     local optionButtons = {}
     local open = false
     local object = {}
@@ -1813,7 +1813,6 @@ function Elements:Dropdown(opts)
     end
 
     local function destroyPopup()
-        if modal then modal:Destroy() modal = nil end
         if popup then popup:Destroy() popup = nil end
         optionButtons = {}
         listContainer = nil
@@ -1823,19 +1822,6 @@ function Elements:Dropdown(opts)
 
     local function buildPopup()
         destroyPopup()
-        -- full-screen catcher: absorbs any click outside the popup so it never
-        -- leaks through to the elements rendered below the dropdown
-        modal = new("TextButton", {
-            BackgroundTransparency = 1,
-            Size = UDim2.new(1, 0, 1, 0),
-            Position = UDim2.new(0, 0, 0, 0),
-            Text = "",
-            AutoButtonColor = false,
-            ZIndex = 600,
-            Parent = PopupLayer,
-        })
-        track(modal.MouseButton1Click:Connect(function() object:Close() end))
-
         popup = new("Frame", {
             BackgroundTransparency = 1,
             Size = UDim2.new(0, frame.AbsoluteSize.X, 0, 0),
@@ -2037,9 +2023,6 @@ function Elements:Dropdown(opts)
         open = false
         tween(arrow, SPEED, { Rotation = 90 })
         if repoConn then repoConn:Disconnect() repoConn = nil end
-        -- destroy the full-screen click catcher immediately so it never
-        -- lingers and locks the mouse
-        if modal then modal:Destroy() modal = nil end
         if popup then
             tween(popup, SPEED * 0.8, { Size = UDim2.new(0, frame.AbsoluteSize.X, 0, 0) })
             local p = popup
