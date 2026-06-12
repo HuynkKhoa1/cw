@@ -30,10 +30,32 @@ local Library = {
     _fontMedium      = Enum.Font.GothamMedium,
     _cornerScale     = 1,
     _animSpeed       = 1,
-    _blurEnabled     = true,
+    _blurEnabled     = false,
     _activeBlur      = nil,
     NotifPosition    = "TopRight",
+    _autoSaveEnabled = false,
+    _autoSaveName    = nil,
 }
+
+local _flagStore = {}
+Library._flagStore = _flagStore
+
+local function queueSave()
+    if not Library._autoSaveEnabled then return end
+    Library._saveToken = (Library._saveToken or 0) + 1
+    local token = Library._saveToken
+    task.delay(0.6, function()
+        if token == Library._saveToken and Library._autoSaveEnabled then
+            Library:SaveConfig(Library._autoSaveName, true)
+        end
+    end)
+end
+Library._queueSave = queueSave
+
+Library.Flags = setmetatable({}, {
+    __index = function(_, k) return _flagStore[k] end,
+    __newindex = function(_, k, v) _flagStore[k] = v; queueSave() end,
+})
 
 local function buildTheme(d)
     local function dim(c, f) return c:Lerp(Color3.new(0, 0, 0), f or 0.4) end
@@ -570,6 +592,7 @@ local notifLayout = new("UIListLayout", {
 
 function Library:SetNotifPosition(pos)
     Library.NotifPosition = pos
+    if Library._queueSave then Library._queueSave() end
     if pos == "TopRight" then
         NotifHolder.AnchorPoint = Vector2.new(1, 0)
         NotifHolder.Position = UDim2.new(1, -16, 0, 16)
@@ -967,57 +990,99 @@ local function ensureFolder()
     return true
 end
 
-function Library:SaveConfig(name)
+local function encodeValue(value)
+    if typeof(value) == "Color3" then
+        return { __t = "Color3", r = value.R, g = value.G, b = value.B }
+    elseif typeof(value) == "EnumItem" then
+        return { __t = "Enum", n = value.Name }
+    end
+    return value
+end
+
+local function decodeValue(value)
+    if typeof(value) == "table" and value.__t == "Color3" then
+        return Color3.new(value.r, value.g, value.b)
+    elseif typeof(value) == "table" and value.__t == "Enum" then
+        return Enum.KeyCode[value.n] or value.n
+    end
+    return value
+end
+
+function Library:SaveConfig(name, silent)
     if not ensureFolder() then
-        Library:Notify({ Title = "Config", Content = "No filesystem access.", Type = "Error" })
+        if not silent then Library:Notify({ Title = "Config", Content = "No filesystem access.", Type = "Error" }) end
         return false
     end
-    name = name or "default"
-    local data = { __theme = Library.CurrentThemeName }
-    for flag, value in pairs(Library.Flags) do
-        if typeof(value) == "Color3" then
-            data[flag] = { __t = "Color3", r = value.R, g = value.G, b = value.B }
-        elseif typeof(value) == "EnumItem" then
-            data[flag] = { __t = "Enum", n = value.Name }
-        else
-            data[flag] = value
-        end
+    name = name or Library._autoSaveName or "default"
+    local data = {
+        __theme  = Library.CurrentThemeName,
+        __ui = {
+            accent     = Library._accentOverride and encodeValue(Library._accentOverride) or nil,
+            corner     = Library._cornerScale,
+            anim       = Library._animSpeed,
+            blur       = Library._blurEnabled,
+            notif      = Library.NotifPosition,
+            toggleKey  = Library.ToggleKey and Library.ToggleKey.Name or nil,
+        },
+        __flags = {},
+    }
+    for flag, value in pairs(_flagStore) do
+        data.__flags[flag] = encodeValue(value)
     end
     local ok, encoded = pcall(function() return HttpService:JSONEncode(data) end)
     if not ok then return false end
     pcall(writefile, Library.ConfigFolder .. "/" .. name .. ".json", encoded)
-    Library:Notify({ Title = "Config", Content = "Saved '" .. name .. "'.", Type = "Success" })
+    if not silent then Library:Notify({ Title = "Config", Content = "Saved '" .. name .. "'.", Type = "Success" }) end
     return true
 end
 
-function Library:LoadConfig(name)
+function Library:LoadConfig(name, silent)
     if not hasFS then return false end
-    name = name or "default"
+    name = name or Library._autoSaveName or "default"
     local path = Library.ConfigFolder .. "/" .. name .. ".json"
     if typeof(isfile) ~= "function" or not isfile(path) then
-        Library:Notify({ Title = "Config", Content = "No config named '" .. name .. "'.", Type = "Warning" })
+        if not silent then Library:Notify({ Title = "Config", Content = "No config named '" .. name .. "'.", Type = "Warning" }) end
         return false
     end
     local ok, raw = pcall(readfile, path)
     if not ok then return false end
     local ok2, data = pcall(function() return HttpService:JSONDecode(raw) end)
     if not ok2 then return false end
+
     if data.__theme and Library.Themes[data.__theme] then
         Library:SetTheme(data.__theme)
     end
-    for flag, value in pairs(data) do
-        if flag ~= "__theme" then
+    if data.__ui then
+        local ui = data.__ui
+        if ui.accent then Library:SetAccent(decodeValue(ui.accent)) end
+        if ui.corner then Library:SetCornerScale(ui.corner) end
+        if ui.anim then Library:SetAnimationSpeed(ui.anim) end
+        if ui.notif then Library:SetNotifPosition(ui.notif) end
+        if ui.blur ~= nil then Library:EnableBlur(ui.blur) end
+        if ui.toggleKey and Enum.KeyCode[ui.toggleKey] then Library.ToggleKey = Enum.KeyCode[ui.toggleKey] end
+    end
+
+    local flags = data.__flags or data
+    for flag, value in pairs(flags) do
+        if flag ~= "__theme" and flag ~= "__ui" and flag ~= "__flags" then
             local option = Library.Options[flag]
-            if typeof(value) == "table" and value.__t == "Color3" then
-                value = Color3.new(value.r, value.g, value.b)
-            elseif typeof(value) == "table" and value.__t == "Enum" then
-                value = Enum.KeyCode[value.n] or value.n
-            end
-            if option then option:Set(value) else Library.Flags[flag] = value end
+            value = decodeValue(value)
+            if option then option:Set(value) else _flagStore[flag] = value end
         end
     end
-    Library:Notify({ Title = "Config", Content = "Loaded '" .. name .. "'.", Type = "Success" })
+    if not silent then Library:Notify({ Title = "Config", Content = "Loaded '" .. name .. "'.", Type = "Success" }) end
     return true
+end
+
+function Library:EnableAutoSave(name)
+    Library._autoSaveName = name or "autosave"
+    Library:LoadConfig(Library._autoSaveName, true)
+    Library._autoSaveEnabled = true
+    return Library._autoSaveName
+end
+
+function Library:DisableAutoSave()
+    Library._autoSaveEnabled = false
 end
 
 function Library:ListConfigs()
@@ -1083,6 +1148,7 @@ function Library:SetTheme(name)
     for _, apply in ipairs(Library._themeCallbacks) do
         pcall(apply)
     end
+    if Library._queueSave then Library._queueSave() end
 end
 
 function Library:SetAccent(color)
@@ -1090,18 +1156,22 @@ function Library:SetAccent(color)
     for _, apply in ipairs(Library._themeCallbacks) do
         pcall(apply)
     end
+    if Library._queueSave then Library._queueSave() end
 end
 
 function Library:SetCornerScale(scale)
     Library._cornerScale = scale or 1
+    if Library._queueSave then Library._queueSave() end
 end
 
 function Library:SetAnimationSpeed(mult)
     Library._animSpeed = mult or 1
+    if Library._queueSave then Library._queueSave() end
 end
 
 function Library:EnableBlur(enabled)
     Library._blurEnabled = enabled
+    if Library._queueSave then Library._queueSave() end
     if enabled then
         if not Library._activeBlur then
             local blur = Instance.new("BlurEffect")
@@ -2854,7 +2924,7 @@ function Library:CreateWindow(opts)
     local minSize = opts.MinSize or Vector2.new(460, 320)
     local offset = #Library.Windows * 28
 
-    if opts.Acrylic ~= false then Library:EnableBlur(true) end
+    if opts.Blur == true then Library:EnableBlur(true) end
 
     local root = new("Frame", {
         Name = "Window",
