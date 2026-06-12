@@ -1831,7 +1831,6 @@ function Elements:Dropdown(opts)
             Position = UDim2.new(0, 0, 0, 0),
             Text = "",
             AutoButtonColor = false,
-            Modal = true,
             ZIndex = 600,
             Parent = PopupLayer,
         })
