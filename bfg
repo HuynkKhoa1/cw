@@ -498,6 +498,23 @@ local function keyName(input)
     return tostring(input)
 end
 
+-- Singleton: if a previous KoaUI instance is still around (re-executed the
+-- script), destroy it so only one UI exists at a time.
+do
+    local parent = getParentGui()
+    for _, gui in ipairs(parent:GetChildren()) do
+        if gui:IsA("ScreenGui") and gui.Name:match("^KoaUI_") then
+            pcall(function() gui:Destroy() end)
+        end
+    end
+    -- clear any leftover game-world blur from an older instance
+    for _, fx in ipairs(Lighting:GetChildren()) do
+        if fx:IsA("BlurEffect") and fx.Name == "KoaUIBlur" then
+            pcall(function() fx:Destroy() end)
+        end
+    end
+end
+
 local ScreenGui = new("ScreenGui", {
     Name = "KoaUI_" .. tostring(math.random(1000, 9999)),
     ResetOnSpawn = false,
@@ -1946,6 +1963,16 @@ function Elements:Dropdown(opts)
     local animating = false
     function object:_TotalHeight()
         local contentH = listLayout and listLayout.AbsoluteContentSize.Y or 0
+        -- AbsoluteContentSize is 0 on the frame the popup is built, which makes
+        -- the popup open too short and clips the last option. Estimate height
+        -- from the visible option rows so every item (incl. the last) is clickable.
+        if contentH <= 0 then
+            local rows = 0
+            for _, b in pairs(optionButtons) do
+                if b.frame.Visible then rows += 1 end
+            end
+            contentH = rows * 30 + math.max(0, rows - 1) * 4
+        end
         local listH = math.min(maxListHeight, contentH)
         if listContainer then
             listContainer.Size = UDim2.new(1, 0, 0, listH)
@@ -3252,8 +3279,17 @@ function Library:CreateWindow(opts)
     end))
 
     local minimized = false
-    -- X fully unloads the interface (window + status pill + reopen button + blur)
-    makeTopBtn(Library.Icons.close, -12, function() Library:Unload() end, true)
+    -- X asks for confirmation, then fully unloads everything
+    makeTopBtn(Library.Icons.close, -12, function()
+        Library:Dialog({
+            Title = "Unload UI",
+            Content = "Are you sure you want to unload the interface? This disables everything.",
+            Buttons = {
+                { Title = "Unload", Primary = true, Callback = function() Library:Unload() end },
+                { Title = "Cancel" },
+            },
+        })
+    end, true)
     makeTopBtn(Library.Icons.minimize, -44, function()
         minimized = not minimized
         if Library._openPopup then Library._openPopup() end
