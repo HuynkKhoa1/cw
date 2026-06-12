@@ -1009,12 +1009,17 @@ function Library:LoadConfig(name, silent)
     if not hasFS then return false end
     name = name or Library._autoSaveName or "default"
     local path = Library.ConfigFolder .. "/" .. name .. ".json"
-    if typeof(isfile) ~= "function" or not isfile(path) then
+    -- Some executors ship readfile/writefile but not isfile; only gate on
+    -- isfile when it actually exists, otherwise just try to read.
+    if typeof(isfile) == "function" and not isfile(path) then
         if not silent then Library:Notify({ Title = "Config", Content = "No config named '" .. name .. "'.", Type = "Warning" }) end
         return false
     end
     local ok, raw = pcall(readfile, path)
-    if not ok then return false end
+    if not ok or not raw or raw == "" then
+        if not silent then Library:Notify({ Title = "Config", Content = "No config named '" .. name .. "'.", Type = "Warning" }) end
+        return false
+    end
     local ok2, data = pcall(function() return HttpService:JSONDecode(raw) end)
     if not ok2 then return false end
 
@@ -1152,23 +1157,26 @@ function Library:SetAnimationSpeed(mult)
     if Library._queueSave then Library._queueSave() end
 end
 
+-- Frosts the UI's own glass panels (does NOT blur the 3D game world).
+-- Roblox has no API to blur only the screen behind a GUI, so we make the
+-- acrylic panels more see-through/frosted instead of adding a Lighting blur.
 function Library:EnableBlur(enabled)
     Library._blurEnabled = enabled
+    Library._seeThrough = enabled and true or false
     if Library._queueSave then Library._queueSave() end
-    if enabled then
-        if not Library._activeBlur then
-            local blur = Instance.new("BlurEffect")
-            blur.Size = 0
-            blur.Parent = Lighting
-            Library._activeBlur = blur
-            tween(blur, 0.3, { Size = 18 })
-        end
-    else
-        if Library._activeBlur then
-            local b = Library._activeBlur
-            Library._activeBlur = nil
-            tween(b, 0.3, { Size = 0 })
-            task.delay(0.32, function() if b then b:Destroy() end end)
+    -- remove any legacy game-world blur left over from older versions
+    if Library._activeBlur then
+        local b = Library._activeBlur
+        Library._activeBlur = nil
+        pcall(function() b:Destroy() end)
+    end
+    local target = enabled and 0.72 or 0.25
+    for i = #Library._acrylicBgs, 1, -1 do
+        local bg = Library._acrylicBgs[i]
+        if bg and bg.Parent then
+            tween(bg, 0.25, { BackgroundTransparency = target })
+        else
+            table.remove(Library._acrylicBgs, i)
         end
     end
 end
