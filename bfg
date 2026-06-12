@@ -1784,7 +1784,7 @@ function Elements:Dropdown(opts)
     })
     hoverFill(frame)
 
-    local popup, listContainer, listLayout, searchBox
+    local popup, modal, listContainer, listLayout, searchBox
     local optionButtons = {}
     local open = false
     local object = {}
@@ -1813,6 +1813,7 @@ function Elements:Dropdown(opts)
     end
 
     local function destroyPopup()
+        if modal then modal:Destroy() modal = nil end
         if popup then popup:Destroy() popup = nil end
         optionButtons = {}
         listContainer = nil
@@ -1822,19 +1823,33 @@ function Elements:Dropdown(opts)
 
     local function buildPopup()
         destroyPopup()
+        -- full-screen catcher: absorbs any click outside the popup so it never
+        -- leaks through to the elements rendered below the dropdown
+        modal = new("TextButton", {
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 1, 0),
+            Position = UDim2.new(0, 0, 0, 0),
+            Text = "",
+            AutoButtonColor = false,
+            Modal = true,
+            ZIndex = 600,
+            Parent = PopupLayer,
+        })
+        track(modal.MouseButton1Click:Connect(function() object:Close() end))
+
         popup = new("Frame", {
             BackgroundTransparency = 1,
             Size = UDim2.new(0, frame.AbsoluteSize.X, 0, 0),
             ClipsDescendants = true,
-            ZIndex = 520,
+            ZIndex = 601,
             Parent = PopupLayer,
         })
-        acrylicGlass(popup, 10, 520)
+        acrylicGlass(popup, 10, 601)
 
         local inner = new("Frame", {
             BackgroundTransparency = 1,
             Size = UDim2.new(1, 0, 1, 0),
-            ZIndex = 523,
+            ZIndex = 604,
             Parent = popup,
         })
         padding(inner, 6, 6, 6, 6)
@@ -1846,7 +1861,7 @@ function Elements:Dropdown(opts)
                 BackgroundColor3 = Library.Theme.Inset,
                 BorderSizePixel = 0,
                 LayoutOrder = 1,
-                ZIndex = 524,
+                ZIndex = 606,
                 Parent = inner,
             })
             corner(searchWrap, 8)
@@ -1863,7 +1878,7 @@ function Elements:Dropdown(opts)
                 TextSize = 13,
                 TextXAlignment = Enum.TextXAlignment.Left,
                 ClearTextOnFocus = false,
-                ZIndex = 525,
+                ZIndex = 607,
                 Parent = searchWrap,
             })
             bindTheme(searchBox, function(t) return { TextColor3 = t.Text, PlaceholderColor3 = t.SubText } end)
@@ -1878,7 +1893,7 @@ function Elements:Dropdown(opts)
             ScrollBarImageTransparency = 0.4,
             CanvasSize = UDim2.new(0, 0, 0, 0),
             LayoutOrder = 2,
-            ZIndex = 524,
+            ZIndex = 606,
             Parent = inner,
         })
         listLayout = vlist(listContainer, 4)
@@ -1889,7 +1904,7 @@ function Elements:Dropdown(opts)
                 Size = UDim2.new(1, 0, 0, 30),
                 BorderSizePixel = 0,
                 ClipsDescendants = true,
-                ZIndex = 525,
+                ZIndex = 607,
                 Parent = listContainer,
             })
             corner(optFrame, 8)
@@ -1903,7 +1918,7 @@ function Elements:Dropdown(opts)
                 TextSize = 13,
                 TextXAlignment = Enum.TextXAlignment.Left,
                 TextTruncate = Enum.TextTruncate.AtEnd,
-                ZIndex = 526,
+                ZIndex = 608,
                 Parent = optFrame,
             })
             local tick = new("ImageLabel", {
@@ -1913,14 +1928,14 @@ function Elements:Dropdown(opts)
                 Size = UDim2.new(0, 14, 0, 14),
                 Image = Library.Icons.check,
                 ImageTransparency = 1,
-                ZIndex = 526,
+                ZIndex = 608,
                 Parent = optFrame,
             })
             local optBtn = new("TextButton", {
                 BackgroundTransparency = 1,
                 Size = UDim2.new(1, 0, 1, 0),
                 Text = "",
-                ZIndex = 527,
+                ZIndex = 609,
                 Parent = optFrame,
             })
             optionButtons[v] = { frame = optFrame, label = optLabel, tick = tick }
