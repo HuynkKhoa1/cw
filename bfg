@@ -2037,6 +2037,9 @@ function Elements:Dropdown(opts)
         open = false
         tween(arrow, SPEED, { Rotation = 90 })
         if repoConn then repoConn:Disconnect() repoConn = nil end
+        -- destroy the full-screen click catcher immediately so it never
+        -- lingers and locks the mouse
+        if modal then modal:Destroy() modal = nil end
         if popup then
             tween(popup, SPEED * 0.8, { Size = UDim2.new(0, frame.AbsoluteSize.X, 0, 0) })
             local p = popup
