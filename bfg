@@ -9,7 +9,7 @@ local Lighting         = game:GetService("Lighting")
 local LocalPlayer = Players.LocalPlayer
 
 local Library = {
-    Version          = "6.0.0",
+    Version          = "6.1.0",
     Flags            = {},
     Options          = {},
     Windows          = {},
@@ -1318,8 +1318,8 @@ local function elementBase(parent, height)
         BorderSizePixel = 0,
         Parent = parent,
     })
-    corner(frame, 10)
-    local s = stroke(frame, 0.55)
+    corner(frame, 12)
+    local s = stroke(frame, 0.7)
     bindTheme(frame, function(t) return { BackgroundColor3 = t.Surface, BackgroundTransparency = t.ElementTransparency } end)
     bindTheme(s, function(t) return { Color = t.Stroke } end)
     return frame
@@ -1389,15 +1389,27 @@ function Elements:Button(opts)
         titleLabel.TextYAlignment = Enum.TextYAlignment.Bottom
     end
 
-    local arrow = new("ImageLabel", {
-        BackgroundTransparency = 1,
+    local arrowChip = new("Frame", {
+        BackgroundColor3 = accentColor(),
+        BackgroundTransparency = 0.85,
         AnchorPoint = Vector2.new(1, 0.5),
-        Position = UDim2.new(1, -14, 0.5, 0),
-        Size = UDim2.new(0, 16, 0, 16),
-        Image = Library.Icons.chevron,
-        ImageColor3 = accentColor(),
+        Position = UDim2.new(1, -10, 0.5, 0),
+        Size = UDim2.new(0, 24, 0, 24),
+        BorderSizePixel = 0,
         ZIndex = 2,
         Parent = frame,
+    })
+    corner(arrowChip, 999)
+    bindTheme(arrowChip, function() return { BackgroundColor3 = accentColor() } end)
+    local arrow = new("ImageLabel", {
+        BackgroundTransparency = 1,
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        Position = UDim2.new(0.5, 0, 0.5, 0),
+        Size = UDim2.new(0, 14, 0, 14),
+        Image = Library.Icons.chevron,
+        ImageColor3 = accentColor(),
+        ZIndex = 3,
+        Parent = arrowChip,
     })
     bindTheme(arrow, function() return { ImageColor3 = accentColor() } end)
 
@@ -2474,20 +2486,30 @@ function Elements:Section(opts)
         Size = UDim2.new(1, 0, 0, 26),
         Parent = self.Page,
     })
+    local tick = new("Frame", {
+        AnchorPoint = Vector2.new(0, 0.5),
+        Position = UDim2.new(0, 2, 0.5, 3),
+        Size = UDim2.new(0, 14, 0, 3),
+        BackgroundColor3 = accentColor(),
+        BorderSizePixel = 0,
+        Parent = frame,
+    })
+    corner(tick, 999)
+    bindTheme(tick, function() return { BackgroundColor3 = accentColor() } end)
     local label = new("TextLabel", {
         BackgroundTransparency = 1,
-        Position = UDim2.new(0, 2, 0, 6),
-        Size = UDim2.new(1, -4, 1, -6),
+        Position = UDim2.new(0, 24, 0, 6),
+        Size = UDim2.new(1, -26, 1, -6),
         Font = Library._fontBold,
-        Text = (opts.Title or "Section"):upper(),
-        TextColor3 = Library.Theme.SubText,
-        TextSize = 12,
+        Text = opts.Title or "Section",
+        TextColor3 = Library.Theme.Text,
+        TextSize = 13,
         TextXAlignment = Enum.TextXAlignment.Left,
         Parent = frame,
     })
-    bindTheme(label, function(t) return { TextColor3 = t.SubText } end)
+    bindTheme(label, function(t) return { TextColor3 = t.Text } end)
     local object = {}
-    function object:Set(text) label.Text = text:upper() end
+    function object:Set(text) label.Text = text end
     return object
 end
 
@@ -2861,7 +2883,7 @@ function Library:CreateWindow(opts)
     local windowObj = { Tabs = {} }
 
     local size = opts.Size or UDim2.new(0, 680, 0, 480)
-    local minSize = opts.MinSize or Vector2.new(460, 320)
+    local minSize = opts.MinSize or Vector2.new(520, 360)
     local offset = #Library.Windows * 28
 
     if opts.Blur == true then Library:EnableBlur(true) end
@@ -2886,16 +2908,6 @@ function Library:CreateWindow(opts)
         ZIndex = 5,
         Parent = root,
     })
-    local topStroke = new("Frame", {
-        Position = UDim2.new(0, 0, 1, -1),
-        Size = UDim2.new(1, 0, 0, 1),
-        BackgroundColor3 = Library.Theme.Stroke,
-        BackgroundTransparency = 0.7,
-        BorderSizePixel = 0,
-        ZIndex = 5,
-        Parent = topbar,
-    })
-    bindTheme(topStroke, function(t) return { BackgroundColor3 = t.Stroke } end)
     makeDraggable(topbar, root)
 
     local titleX = 30
@@ -2934,7 +2946,7 @@ function Library:CreateWindow(opts)
         Font = Library._fontBold,
         Text = opts.Title or "KoaUI",
         TextColor3 = Library.Theme.Text,
-        TextSize = 16,
+        TextSize = 17,
         TextXAlignment = Enum.TextXAlignment.Left,
         ZIndex = 6,
         Parent = topbar,
@@ -2967,7 +2979,7 @@ function Library:CreateWindow(opts)
         local searchWrap = new("Frame", {
             AnchorPoint = Vector2.new(1, 0.5),
             Position = UDim2.new(1, -78, 0.5, 0),
-            Size = UDim2.new(0, 168, 0, 28),
+            Size = UDim2.new(0, 180, 0, 30),
             BackgroundColor3 = Library.Theme.Inset,
             BorderSizePixel = 0,
             ZIndex = 6,
@@ -3044,30 +3056,26 @@ function Library:CreateWindow(opts)
     end
 
     local body = new("Frame", {
-        Position = UDim2.new(0, 0, 0, 50),
-        Size = UDim2.new(1, 0, 1, -50),
+        Position = UDim2.new(0, 12, 0, 50),
+        Size = UDim2.new(1, -24, 1, -84),
         BackgroundTransparency = 1,
         ZIndex = 4,
         Parent = root,
     })
 
+    -- Orbit rail: floating circular tab dock (replaces the classic sidebar)
     local sidebar = new("Frame", {
-        Size = UDim2.new(0, 170, 1, 0),
-        BackgroundTransparency = 1,
+        Size = UDim2.new(0, 64, 1, 0),
+        BackgroundColor3 = Library.Theme.Inset,
+        BackgroundTransparency = 0.35,
+        BorderSizePixel = 0,
         ZIndex = 4,
         Parent = body,
     })
-    local sideStroke = new("Frame", {
-        AnchorPoint = Vector2.new(1, 0),
-        Position = UDim2.new(1, 0, 0, 0),
-        Size = UDim2.new(0, 1, 1, 0),
-        BackgroundColor3 = Library.Theme.Stroke,
-        BackgroundTransparency = 0.75,
-        BorderSizePixel = 0,
-        ZIndex = 4,
-        Parent = sidebar,
-    })
-    bindTheme(sideStroke, function(t) return { BackgroundColor3 = t.Stroke } end)
+    corner(sidebar, 18)
+    local railStroke = stroke(sidebar, 0.75)
+    bindTheme(sidebar, function(t) return { BackgroundColor3 = t.Inset } end)
+    bindTheme(railStroke, function(t) return { Color = t.Stroke } end)
 
     local tabList = new("ScrollingFrame", {
         Size = UDim2.new(1, 0, 1, 0),
@@ -3079,17 +3087,67 @@ function Library:CreateWindow(opts)
         ZIndex = 4,
         Parent = sidebar,
     })
-    padding(tabList, 12, 12, 10, 10)
-    vlist(tabList, 5)
+    padding(tabList, 10, 10, 8, 8)
+    vlist(tabList, 8, Enum.HorizontalAlignment.Center)
 
+    -- Floating content panel, detached from the rail
     local content = new("Frame", {
-        Position = UDim2.new(0, 170, 0, 0),
-        Size = UDim2.new(1, -170, 1, 0),
-        BackgroundTransparency = 1,
+        Position = UDim2.new(0, 76, 0, 0),
+        Size = UDim2.new(1, -76, 1, 0),
+        BackgroundColor3 = Library.Theme.Inset,
+        BackgroundTransparency = 0.55,
+        BorderSizePixel = 0,
         ClipsDescendants = true,
         ZIndex = 4,
         Parent = body,
     })
+    corner(content, 18)
+    local contentStroke = stroke(content, 0.8)
+    bindTheme(content, function(t) return { BackgroundColor3 = t.Inset } end)
+    bindTheme(contentStroke, function(t) return { Color = t.Stroke } end)
+
+    -- Big editorial tab title inside the panel
+    local pageHeader = new("TextLabel", {
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0, 18, 0, 12),
+        Size = UDim2.new(1, -36, 0, 28),
+        Font = Library._fontBold,
+        Text = "",
+        TextColor3 = Library.Theme.Text,
+        TextSize = 19,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        ZIndex = 5,
+        Parent = content,
+    })
+    bindTheme(pageHeader, function(t) return { TextColor3 = t.Text } end)
+
+    local pageHolder = new("Frame", {
+        Position = UDim2.new(0, 0, 0, 46),
+        Size = UDim2.new(1, 0, 1, -46),
+        BackgroundTransparency = 1,
+        ZIndex = 4,
+        Parent = content,
+    })
+
+    -- Footer strip: version + theme name
+    local footer = new("TextLabel", {
+        AnchorPoint = Vector2.new(0, 1),
+        Position = UDim2.new(0, 20, 1, -9),
+        Size = UDim2.new(1, -40, 0, 16),
+        BackgroundTransparency = 1,
+        Font = Library._fontMedium,
+        Text = "",
+        TextColor3 = Library.Theme.SubText,
+        TextSize = 11,
+        TextTransparency = 0.25,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        ZIndex = 5,
+        Parent = root,
+    })
+    bindTheme(footer, function(t)
+        footer.Text = "KoaUI v" .. Library.Version .. "  -  " .. (t.Name or "Theme")
+        return { TextColor3 = t.SubText }
+    end)
 
     local resizeHandle = new("TextButton", {
         AnchorPoint = Vector2.new(1, 1),
@@ -3141,12 +3199,13 @@ function Library:CreateWindow(opts)
         if Library._openPopup then Library._openPopup() end
         if minimized then
             body.Visible = false
+            footer.Visible = false
             resizeHandle.Visible = false
             tween(root, SPEED, { Size = UDim2.new(0, size.X.Offset, 0, 50) })
         else
             tween(root, SPEED, { Size = size })
             resizeHandle.Visible = true
-            task.delay(aspeed(0.16), function() body.Visible = true end)
+            task.delay(aspeed(0.16), function() body.Visible = true footer.Visible = true end)
         end
     end)
 
@@ -3156,6 +3215,7 @@ function Library:CreateWindow(opts)
             root.Size = size
             resizeHandle.Visible = true
             body.Visible = true
+            footer.Visible = true
         end
     end)
 
@@ -3185,17 +3245,15 @@ function Library:CreateWindow(opts)
         end
         for n, btn in pairs(windowObj._tabButtons) do
             local on = (n == name)
-            tween(btn.Frame, 0.18, {
-                BackgroundColor3 = Library.Theme.Surface,
-                BackgroundTransparency = on and (Library.Theme.ElementTransparency - 0.15) or 1,
-            })
-            btn.Label.TextColor3 = on and Library.Theme.Text or Library.Theme.SubText
-            if btn.Icon then btn.Icon.ImageColor3 = on and accentColor() or Library.Theme.SubText end
+            btn.Label.TextColor3 = on and Library.Theme.AccentText or Library.Theme.SubText
+            if btn.Icon then btn.Icon.ImageColor3 = on and Library.Theme.AccentText or Library.Theme.SubText end
             tween(btn.Indicator, 0.18, {
-                Size = on and UDim2.new(0, 3, 0.6, 0) or UDim2.new(0, 3, 0, 0),
+                Size = on and UDim2.new(0, 42, 0, 42) or UDim2.new(0, 0, 0, 0),
+                BackgroundTransparency = on and 0 or 0.85,
             })
         end
         windowObj.ActiveTab = name
+        pageHeader.Text = name
         if searchBox then applySearch(searchBox.Text) end
     end
 
@@ -3204,57 +3262,58 @@ function Library:CreateWindow(opts)
         local name = tabOpts.Title or ("Tab " .. (#windowObj.Tabs + 1))
 
         local tabBtn = new("TextButton", {
-            Size = UDim2.new(1, 0, 0, 36),
-            BackgroundColor3 = Library.Theme.Surface,
+            Size = UDim2.new(0, 48, 0, 48),
             BackgroundTransparency = 1,
             Text = "",
             AutoButtonColor = false,
             ZIndex = 4,
             Parent = tabList,
         })
-        corner(tabBtn, 10)
-        bindTheme(tabBtn, function(t) return { BackgroundColor3 = t.Surface } end)
+        corner(tabBtn, 999)
 
+        -- accent disc that blooms behind the icon when active
         local indicator = new("Frame", {
-            AnchorPoint = Vector2.new(0, 0.5),
-            Position = UDim2.new(0, 0, 0.5, 0),
-            Size = UDim2.new(0, 3, 0, 0),
+            AnchorPoint = Vector2.new(0.5, 0.5),
+            Position = UDim2.new(0.5, 0, 0.5, 0),
+            Size = UDim2.new(0, 0, 0, 0),
             BackgroundColor3 = accentColor(),
+            BackgroundTransparency = 0.85,
             BorderSizePixel = 0,
-            ZIndex = 5,
+            ZIndex = 4,
             Parent = tabBtn,
         })
-        corner(indicator, 2)
+        corner(indicator, 999)
         bindTheme(indicator, function() return { BackgroundColor3 = accentColor() } end)
 
-        local iconImg, labelX = nil, 14
+        local iconImg
         if tabOpts.Icon then
             iconImg = new("ImageLabel", {
                 BackgroundTransparency = 1,
-                Position = UDim2.new(0, 12, 0.5, 0),
-                AnchorPoint = Vector2.new(0, 0.5),
-                Size = UDim2.new(0, 16, 0, 16),
+                AnchorPoint = Vector2.new(0.5, 0.5),
+                Position = UDim2.new(0.5, 0, 0.5, 0),
+                Size = UDim2.new(0, 20, 0, 20),
                 Image = Library:GetIcon(tabOpts.Icon) or Library.Icons[tabOpts.Icon] or tabOpts.Icon,
                 ImageColor3 = Library.Theme.SubText,
                 ZIndex = 5,
                 Parent = tabBtn,
             })
-            labelX = 36
         end
 
+        -- tabs without an icon get a monogram chip
         local tabLabel = new("TextLabel", {
             BackgroundTransparency = 1,
-            Position = UDim2.new(0, labelX, 0, 0),
-            Size = UDim2.new(1, -(labelX + 4), 1, 0),
-            Font = Library._fontMedium,
-            Text = name,
+            AnchorPoint = Vector2.new(0.5, 0.5),
+            Position = UDim2.new(0.5, 0, 0.5, 0),
+            Size = UDim2.new(1, 0, 1, 0),
+            Font = Library._fontBold,
+            Text = string.upper(string.sub(name, 1, 1)),
             TextColor3 = Library.Theme.SubText,
-            TextSize = 13,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            TextTruncate = Enum.TextTruncate.AtEnd,
+            TextSize = 16,
+            Visible = not tabOpts.Icon,
             ZIndex = 5,
             Parent = tabBtn,
         })
+        attachTooltip(tabBtn, name)
 
         local page = new("ScrollingFrame", {
             Size = UDim2.new(1, 0, 1, 0),
@@ -3267,9 +3326,9 @@ function Library:CreateWindow(opts)
             AutomaticCanvasSize = Enum.AutomaticSize.Y,
             Visible = false,
             ZIndex = 4,
-            Parent = content,
+            Parent = pageHolder,
         })
-        padding(page, 14, 16, 14, 14)
+        padding(page, 6, 16, 14, 14)
         vlist(page, 10)
 
         windowObj._tabButtons[name] = { Frame = tabBtn, Label = tabLabel, Indicator = indicator, Icon = iconImg }
