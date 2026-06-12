@@ -5,11 +5,13 @@ local RunService       = game:GetService("RunService")
 local HttpService      = game:GetService("HttpService")
 local CoreGui          = game:GetService("CoreGui")
 local Lighting         = game:GetService("Lighting")
+local TeleportService  = game:GetService("TeleportService")
+local VirtualUser      = game:GetService("VirtualUser")
 
 local LocalPlayer = Players.LocalPlayer
 
 local Library = {
-    Version          = "6.1.0",
+    Version          = "6.2.0",
     Flags            = {},
     Options          = {},
     Windows          = {},
@@ -34,6 +36,8 @@ local Library = {
     _activeBlur      = nil,
     _seeThrough      = false,
     _acrylicBgs      = {},
+    _corners         = {},
+    _restoreCallbacks = {},
     NotifPosition    = "TopRight",
     _autoSaveEnabled = false,
     _autoSaveName    = nil,
@@ -284,7 +288,10 @@ local function new(class, props, children)
 end
 
 local function corner(parent, radius)
-    return new("UICorner", { CornerRadius = UDim.new(0, (radius or 8) * Library._cornerScale), Parent = parent })
+    local base = radius or 8
+    local c = new("UICorner", { CornerRadius = UDim.new(0, base * Library._cornerScale), Parent = parent })
+    table.insert(Library._corners, { inst = c, base = base })
+    return c
 end
 
 local function stroke(parent, transparency, thickness)
@@ -673,7 +680,6 @@ function Library:Notify(opts)
     local resizeConn = holder:GetPropertyChangedSignal("AbsoluteSize"):Connect(resize)
     task.defer(resize)
 
-    card.Position = UDim2.new(1, 20, 0, 0)
     if progress then
         tween(progress, duration, { Size = UDim2.new(0, 0, 0, 2) }, Enum.EasingStyle.Linear)
     end
@@ -792,12 +798,14 @@ function Library:CreateStatus(opts)
     })
     bindTheme(label, function(t) return { TextColor3 = t.Text } end)
 
+    local didDrag = false
     do
         local dragging, dragStart, startPos
         track(pill.InputBegan:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseButton1
                 or input.UserInputType == Enum.UserInputType.Touch then
                 dragging = true
+                didDrag = false
                 dragStart = input.Position
                 startPos = pill.Position
             end
@@ -806,6 +814,7 @@ function Library:CreateStatus(opts)
             if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement
                 or input.UserInputType == Enum.UserInputType.Touch) then
                 local delta = input.Position - dragStart
+                if delta.Magnitude > 5 then didDrag = true end
                 pill.Position = UDim2.new(
                     startPos.X.Scale, startPos.X.Offset + delta.X,
                     startPos.Y.Scale, startPos.Y.Offset + delta.Y)
@@ -820,6 +829,7 @@ function Library:CreateStatus(opts)
     end
 
     track(pill.MouseButton1Click:Connect(function()
+        if didDrag then didDrag = false; return end
         if opts.Callback then opts.Callback() else Library:ToggleVisible() end
     end))
 
@@ -943,16 +953,26 @@ local function encodeValue(value)
     if typeof(value) == "Color3" then
         return { __t = "Color3", r = value.R, g = value.G, b = value.B }
     elseif typeof(value) == "EnumItem" then
-        return { __t = "Enum", n = value.Name }
+        return { __t = "Enum", et = tostring(value.EnumType), n = value.Name }
     end
     return value
+end
+
+local function decodeEnum(et, n)
+    local ok, res = pcall(function()
+        if et == "Enum.KeyCode" then return Enum.KeyCode[n]
+        elseif et == "Enum.UserInputType" then return Enum.UserInputType[n]
+        else return (Enum.KeyCode[n] or Enum.UserInputType[n]) end
+    end)
+    if ok then return res end
+    return nil
 end
 
 local function decodeValue(value)
     if typeof(value) == "table" and value.__t == "Color3" then
         return Color3.new(value.r, value.g, value.b)
     elseif typeof(value) == "table" and value.__t == "Enum" then
-        return Enum.KeyCode[value.n] or value.n
+        return decodeEnum(value.et, value.n)
     end
     return value
 end
@@ -1008,7 +1028,10 @@ function Library:LoadConfig(name, silent)
         if ui.anim then Library:SetAnimationSpeed(ui.anim) end
         if ui.notif then Library:SetNotifPosition(ui.notif) end
         if ui.blur ~= nil then Library:EnableBlur(ui.blur) end
-        if ui.toggleKey and Enum.KeyCode[ui.toggleKey] then Library.ToggleKey = Enum.KeyCode[ui.toggleKey] end
+        if ui.toggleKey then
+            local k = decodeEnum("Enum.KeyCode", ui.toggleKey) or decodeEnum("Enum.UserInputType", ui.toggleKey)
+            if k then Library.ToggleKey = k end
+        end
     end
 
     local flags = data.__flags or data
@@ -1110,7 +1133,18 @@ end
 
 function Library:SetCornerScale(scale)
     Library._cornerScale = scale or 1
+    for _, entry in ipairs(Library._corners) do
+        if entry.inst and entry.inst.Parent then
+            entry.inst.CornerRadius = UDim.new(0, entry.base * Library._cornerScale)
+        end
+    end
     if Library._queueSave then Library._queueSave() end
+end
+
+function Library:GetFlags()
+    local copy = {}
+    for k, v in pairs(_flagStore) do copy[k] = v end
+    return copy
 end
 
 function Library:SetAnimationSpeed(mult)
@@ -1120,12 +1154,21 @@ end
 
 function Library:EnableBlur(enabled)
     Library._blurEnabled = enabled
-    Library._seeThrough = enabled and true or false
     if Library._queueSave then Library._queueSave() end
-    local target = enabled and 0.72 or 0.25
-    for _, bg in ipairs(Library._acrylicBgs) do
-        if bg and bg.Parent then
-            tween(bg, 0.25, { BackgroundTransparency = target })
+    if enabled then
+        if not Library._activeBlur then
+            local blur = Instance.new("BlurEffect")
+            blur.Size = 0
+            blur.Parent = Lighting
+            Library._activeBlur = blur
+            tween(blur, 0.3, { Size = 18 })
+        end
+    else
+        if Library._activeBlur then
+            local b = Library._activeBlur
+            Library._activeBlur = nil
+            tween(b, 0.3, { Size = 0 })
+            task.delay(0.32, function() if b then b:Destroy() end end)
         end
     end
 end
@@ -1140,8 +1183,6 @@ function Library:Unload()
     table.clear(Library.Connections)
     if ScreenGui then ScreenGui:Destroy() end
 end
-
-Library._restoreCallbacks = {}
 
 function Library:SetVisible(state)
     Library._hidden = not state
@@ -1326,7 +1367,6 @@ local function elementBase(parent, height)
 end
 
 local function hoverFill(frame)
-    local baseT = Library.Theme.ElementTransparency
     track(frame.MouseEnter:Connect(function()
         tween(frame, 0.18, { BackgroundColor3 = Library.Theme.Hover, BackgroundTransparency = math.max(0, Library.Theme.ElementTransparency - 0.12) })
     end))
@@ -1613,8 +1653,15 @@ function Elements:Slider(opts)
     end
     function object:Get() return value end
 
+    local function stripSuffix(text)
+        if suffix ~= "" then
+            local idx = text:find(suffix, 1, true)
+            if idx then text = text:sub(1, idx - 1) end
+        end
+        return text
+    end
     track(valueBox.FocusLost:Connect(function()
-        local num = tonumber((valueBox.Text:gsub(suffix, "")))
+        local num = tonumber(stripSuffix(valueBox.Text))
         if num then object:Set(num) else valueBox.Text = tostring(value) .. suffix end
     end))
 
@@ -1957,24 +2004,25 @@ function Elements:Dropdown(opts)
     end
 
     function object:Set(v)
+        local cbValue
         if multi then
             selected = {}
             if typeof(v) == "table" then
                 for _, item in ipairs(v) do selected[item] = true end
             end
-            if flag then
-                local arr = {}
-                for _, val in ipairs(values) do
-                    if selected[val] then table.insert(arr, val) end
-                end
-                Library.Flags[flag] = arr
+            local arr = {}
+            for _, val in ipairs(values) do
+                if selected[val] then table.insert(arr, val) end
             end
+            if flag then Library.Flags[flag] = arr end
+            cbValue = arr
         else
             selected = v
             if flag then Library.Flags[flag] = selected end
+            cbValue = selected
         end
         if open then refreshHighlights() else valueLabel.Text = labelText() end
-        if opts.Callback then task.spawn(opts.Callback, selected) end
+        if opts.Callback then task.spawn(opts.Callback, cbValue) end
     end
     function object:Get() return selected end
 
@@ -1992,6 +2040,8 @@ function Elements:Dropdown(opts)
     end
 
     track(headBtn.MouseButton1Click:Connect(function() object:Toggle() end))
+
+    object._frame = frame
 
     valueLabel.Text = labelText()
     if multi and opts.Default then
@@ -2104,6 +2154,7 @@ function Elements:Keybind(opts)
         key = v
         keyBtn.Text = key and keyName(key) or "None"
         if flag then Library.Flags[flag] = key end
+        if opts.OnChanged then task.spawn(opts.OnChanged, key) end
     end
     function object:Get() return key end
 
@@ -3218,6 +3269,7 @@ function Library:CreateWindow(opts)
             footer.Visible = true
         end
     end)
+    windowObj._restoreIndex = #Library._restoreCallbacks
 
     windowObj._tabButtons = {}
     windowObj._tabPages = {}
@@ -3261,11 +3313,24 @@ function Library:CreateWindow(opts)
         tabOpts = tabOpts or {}
         local name = tabOpts.Title or ("Tab " .. (#windowObj.Tabs + 1))
 
+        -- "Settings" is reserved: return the locked auto-created settings tab
+        if name == "Settings" and windowObj.SettingsTab and not tabOpts._internal then
+            return windowObj.SettingsTab
+        end
+
+        -- avoid clobbering a tab with a duplicate title
+        if windowObj._tabPages[name] then
+            local n = 2
+            while windowObj._tabPages[name .. " (" .. n .. ")"] do n += 1 end
+            name = name .. " (" .. n .. ")"
+        end
+
         local tabBtn = new("TextButton", {
             Size = UDim2.new(0, 48, 0, 48),
             BackgroundTransparency = 1,
             Text = "",
             AutoButtonColor = false,
+            LayoutOrder = tabOpts._internal and 1000 or (#windowObj.Tabs + 1),
             ZIndex = 4,
             Parent = tabList,
         })
@@ -3346,7 +3411,13 @@ function Library:CreateWindow(opts)
         windowObj._tabs[name] = tabObj
         table.insert(windowObj.Tabs, tabObj)
 
-        if #windowObj.Tabs == 1 then activate(name) end
+        -- first user tab (non-settings) becomes the default active tab
+        if not tabOpts._internal and not windowObj._firstUserTab then
+            windowObj._firstUserTab = name
+            activate(name)
+        elseif #windowObj.Tabs == 1 then
+            activate(name)
+        end
         return tabObj
     end
 
@@ -3355,8 +3426,23 @@ function Library:CreateWindow(opts)
         for i, w in ipairs(Library.Windows) do
             if w == windowObj then table.remove(Library.Windows, i) break end
         end
+        -- prune this window's restore callback
+        if windowObj._restoreIndex then
+            Library._restoreCallbacks[windowObj._restoreIndex] = function() end
+        end
         tween(root, 0.2, { Size = UDim2.new(0, size.X.Offset * 0.9, 0, 0) })
-        task.delay(0.22, function() if root then root:Destroy() end end)
+        task.delay(0.22, function()
+            if root then root:Destroy() end
+            -- drop theme callbacks / acrylic bgs / corners whose instances are gone
+            for i = #Library._acrylicBgs, 1, -1 do
+                local bg = Library._acrylicBgs[i]
+                if not (bg and bg.Parent) then table.remove(Library._acrylicBgs, i) end
+            end
+            for i = #Library._corners, 1, -1 do
+                local entry = Library._corners[i]
+                if not (entry.inst and entry.inst.Parent) then table.remove(Library._corners, i) end
+            end
+        end)
         if #Library.Windows == 0 then Library:EnableBlur(false) end
     end
 
@@ -3368,12 +3454,22 @@ function Library:CreateWindow(opts)
     tween(root, 0.35, { Size = size })
 
     table.insert(Library.Windows, windowObj)
+
+    -- Locked Settings tab: every window always has one, pinned at the end
+    windowObj.SettingsTab = Library:CreateSettingsTab(windowObj, opts.ConfigName)
+
     return windowObj
 end
 
 function Library:CreateSettingsTab(window, configName)
-    configName = configName or "default"
-    local tab = window:CreateTab({ Title = "Settings", Icon = "settings" })
+    -- idempotent: a window only ever has one Settings tab
+    if window.SettingsTab then
+        if configName then window._settingsConfigName = configName end
+        return window.SettingsTab
+    end
+    configName = configName or window._settingsConfigName or "default"
+    local tab = window:CreateTab({ Title = "Settings", Icon = "settings", _internal = true })
+    window.SettingsTab = tab
 
     tab:Section({ Title = "Appearance" })
 
@@ -3397,13 +3493,13 @@ function Library:CreateSettingsTab(window, configName)
 
     tab:Slider({
         Title = "Corner Radius",
-        Min = 0, Max = 2, Decimals = 2, Default = 1,
+        Min = 0, Max = 2, Decimals = 2, Default = Library._cornerScale,
         Callback = function(v) Library:SetCornerScale(v) end,
     })
 
     tab:Slider({
         Title = "Animation Speed",
-        Min = 0.25, Max = 2, Decimals = 2, Default = 1,
+        Min = 0.25, Max = 2, Decimals = 2, Default = Library._animSpeed,
         Callback = function(v) Library:SetAnimationSpeed(v) end,
     })
 
@@ -3418,7 +3514,7 @@ function Library:CreateSettingsTab(window, configName)
     tab:Keybind({
         Title = "Toggle UI Key",
         Default = Library.ToggleKey,
-        Callback = function() Library:ToggleVisible() end,
+        OnChanged = function(k) Library.ToggleKey = k; if Library._queueSave then Library._queueSave() end end,
     })
 
     tab:Dropdown({
@@ -3457,6 +3553,82 @@ function Library:CreateSettingsTab(window, configName)
         end,
     })
 
+    tab:Section({ Title = "Server" })
+
+    local function serverHop(lowest)
+        local ok, servers = pcall(function()
+            return HttpService:JSONDecode(game:HttpGet(
+                "https://games.roblox.com/v1/games/" .. game.PlaceId
+                .. "/servers/Public?sortOrder=Asc&limit=100"
+            ))
+        end)
+        if not ok or not servers or not servers.data then
+            Library:Notify({ Title = "Server", Content = "Failed to fetch servers.", Type = "Error" })
+            return
+        end
+        local best
+        for _, s in ipairs(servers.data) do
+            if s.id ~= game.JobId and s.playing and s.maxPlayers and s.playing < s.maxPlayers then
+                if not best then
+                    best = s
+                elseif lowest and s.playing < best.playing then
+                    best = s
+                elseif not lowest then
+                    best = s
+                    break
+                end
+            end
+        end
+        if best then
+            TeleportService:TeleportToPlaceInstance(game.PlaceId, best.id, LocalPlayer)
+        else
+            Library:Notify({ Title = "Server", Content = "No suitable server found.", Type = "Warning" })
+        end
+    end
+
+    tab:Button({
+        Title = "Rejoin Server",
+        Callback = function()
+            TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer)
+        end,
+    })
+    tab:Button({
+        Title = "Server Hop",
+        Description = "Joins a different public server",
+        Callback = function() serverHop(false) end,
+    })
+    tab:Button({
+        Title = "Low Server Join",
+        Description = "Joins the emptiest available server",
+        Callback = function() serverHop(true) end,
+    })
+    tab:Button({
+        Title = "Copy Job ID",
+        Callback = function()
+            if typeof(setclipboard) == "function" then
+                pcall(setclipboard, game.JobId)
+                Library:Notify({ Title = "Server", Content = "Job ID copied.", Type = "Success" })
+            else
+                Library:Notify({ Title = "Server", Content = "Clipboard not supported.", Type = "Warning" })
+            end
+        end,
+    })
+
+    tab:Toggle({
+        Title = "Anti-AFK",
+        Flag = "KoaUI_AntiAFK",
+        Default = true,
+        Callback = function() end,
+    })
+    track(LocalPlayer.Idled:Connect(function()
+        if Library.Flags.KoaUI_AntiAFK then
+            pcall(function()
+                VirtualUser:CaptureController()
+                VirtualUser:ClickButton2(Vector2.new())
+            end)
+        end
+    end))
+
     tab:Section({ Title = "Danger" })
     tab:Button({
         Title = "Unload UI",
@@ -3488,6 +3660,14 @@ track(UserInputService.InputBegan:Connect(function(input, gpe)
                 break
             end
         end
+        -- a click on the open dropdown's own header is "inside" so its Toggle handles open/close
+        if not insidePopup and Library._openDropdown and Library._openDropdown._frame then
+            local hf = Library._openDropdown._frame
+            local p, sz = hf.AbsolutePosition, hf.AbsoluteSize
+            if pos.X >= p.X and pos.X <= p.X + sz.X and pos.Y >= p.Y and pos.Y <= p.Y + sz.Y then
+                insidePopup = true
+            end
+        end
         if not insidePopup then
             task.defer(function()
                 if Library._openPopup and Library._openDropdown then
@@ -3497,7 +3677,7 @@ track(UserInputService.InputBegan:Connect(function(input, gpe)
         end
     end
     if gpe then return end
-    if input.KeyCode == Library.ToggleKey then
+    if input.KeyCode == Library.ToggleKey or input.UserInputType == Library.ToggleKey then
         Library:ToggleVisible()
     end
 end))
