@@ -246,6 +246,107 @@ Library.Themes = {
         Text = Color3.fromRGB(240, 250, 255), SubText = Color3.fromRGB(180, 200, 220), Hover = Color3.fromRGB(90, 140, 180),
         AccentText = Color3.fromRGB(10, 18, 25),
     }),
+    -- ── Custom pack: galaxy / chill ─────────────────────────
+    Galaxy = buildTheme({
+        -- deep space violet, starlight lavender accent
+        Name = "Galaxy", Accent = Color3.fromRGB(170, 148, 255),
+        AcrylicMain = Color3.fromRGB(16, 12, 38), AcrylicBorder = Color3.fromRGB(74, 60, 130),
+        AcrylicGradient = ColorSequence.new(Color3.fromRGB(10, 6, 28), Color3.fromRGB(38, 18, 64)),
+        AcrylicNoise = 0.93, Element = Color3.fromRGB(98, 80, 170), ElementBorder = Color3.fromRGB(50, 38, 96),
+        DropdownHolder = Color3.fromRGB(24, 18, 52), ElementTransparency = 0.86,
+        Text = Color3.fromRGB(236, 233, 250), SubText = Color3.fromRGB(158, 150, 196), Hover = Color3.fromRGB(122, 102, 200),
+        AccentText = Color3.fromRGB(14, 10, 32),
+    }),
+    Nebula = buildTheme({
+        -- magenta dust drifting into teal void
+        Name = "Nebula", Accent = Color3.fromRGB(255, 110, 199),
+        AcrylicMain = Color3.fromRGB(24, 10, 36), AcrylicBorder = Color3.fromRGB(110, 45, 120),
+        AcrylicGradient = ColorSequence.new(Color3.fromRGB(30, 8, 48), Color3.fromRGB(8, 28, 52)),
+        AcrylicNoise = 0.92, Element = Color3.fromRGB(140, 60, 140), ElementBorder = Color3.fromRGB(70, 30, 80),
+        DropdownHolder = Color3.fromRGB(36, 16, 52), ElementTransparency = 0.86,
+        Text = Color3.fromRGB(248, 238, 250), SubText = Color3.fromRGB(176, 152, 188), Hover = Color3.fromRGB(170, 80, 160),
+        AccentText = Color3.fromRGB(40, 8, 30),
+    }),
+    Aurora = buildTheme({
+        -- polar night sky, green light curtain
+        Name = "Aurora", Accent = Color3.fromRGB(96, 245, 178),
+        AcrylicMain = Color3.fromRGB(8, 18, 30), AcrylicBorder = Color3.fromRGB(40, 90, 85),
+        AcrylicGradient = ColorSequence.new(Color3.fromRGB(6, 14, 30), Color3.fromRGB(10, 44, 42)),
+        AcrylicNoise = 0.94, Element = Color3.fromRGB(50, 120, 105), ElementBorder = Color3.fromRGB(25, 65, 60),
+        DropdownHolder = Color3.fromRGB(14, 34, 38), ElementTransparency = 0.87,
+        Text = Color3.fromRGB(230, 246, 240), SubText = Color3.fromRGB(148, 178, 170), Hover = Color3.fromRGB(70, 150, 130),
+        AccentText = Color3.fromRGB(6, 24, 20),
+    }),
+    Moonlight = buildTheme({
+        -- calm silver-blue, almost no color
+        Name = "Moonlight", Accent = Color3.fromRGB(196, 211, 235),
+        AcrylicMain = Color3.fromRGB(22, 26, 34), AcrylicBorder = Color3.fromRGB(70, 78, 95),
+        AcrylicGradient = ColorSequence.new(Color3.fromRGB(24, 28, 38), Color3.fromRGB(32, 38, 52)),
+        AcrylicNoise = 0.95, Element = Color3.fromRGB(96, 106, 128), ElementBorder = Color3.fromRGB(52, 58, 72),
+        DropdownHolder = Color3.fromRGB(32, 37, 48), ElementTransparency = 0.87,
+        Text = Color3.fromRGB(235, 240, 248), SubText = Color3.fromRGB(160, 170, 188), Hover = Color3.fromRGB(120, 132, 158),
+        AccentText = Color3.fromRGB(24, 28, 40),
+    }),
+    Lofi = buildTheme({
+        -- warm dusk room, peach lamp glow, a bit of tape grain
+        Name = "Lofi", Accent = Color3.fromRGB(255, 170, 128),
+        AcrylicMain = Color3.fromRGB(38, 30, 36), AcrylicBorder = Color3.fromRGB(95, 72, 78),
+        AcrylicGradient = ColorSequence.new(Color3.fromRGB(44, 32, 40), Color3.fromRGB(58, 40, 44)),
+        AcrylicNoise = 0.90, Element = Color3.fromRGB(130, 96, 96), ElementBorder = Color3.fromRGB(70, 52, 56),
+        DropdownHolder = Color3.fromRGB(52, 40, 46), ElementTransparency = 0.86,
+        Text = Color3.fromRGB(244, 234, 226), SubText = Color3.fromRGB(178, 158, 152), Hover = Color3.fromRGB(158, 116, 110),
+        AccentText = Color3.fromRGB(46, 28, 22),
+    }),
+    SakuraNight = buildTheme({
+        -- slate night with blossom pink
+        Name = "SakuraNight", Accent = Color3.fromRGB(255, 158, 184),
+        AcrylicMain = Color3.fromRGB(24, 22, 36), AcrylicBorder = Color3.fromRGB(110, 70, 100),
+        AcrylicGradient = ColorSequence.new(Color3.fromRGB(28, 24, 44), Color3.fromRGB(52, 32, 54)),
+        AcrylicNoise = 0.93, Element = Color3.fromRGB(140, 90, 120), ElementBorder = Color3.fromRGB(72, 48, 70),
+        DropdownHolder = Color3.fromRGB(38, 32, 54), ElementTransparency = 0.86,
+        Text = Color3.fromRGB(246, 238, 244), SubText = Color3.fromRGB(174, 158, 178), Hover = Color3.fromRGB(170, 110, 140),
+        AccentText = Color3.fromRGB(52, 22, 36),
+    }),
+    Vaporwave = buildTheme({
+        -- retro dusk: purple haze fading to teal, hot pink accent
+        Name = "Vaporwave", Accent = Color3.fromRGB(255, 113, 206),
+        AcrylicMain = Color3.fromRGB(26, 16, 48), AcrylicBorder = Color3.fromRGB(90, 60, 150),
+        AcrylicGradient = ColorSequence.new(Color3.fromRGB(34, 16, 64), Color3.fromRGB(12, 40, 76)),
+        AcrylicNoise = 0.91, Element = Color3.fromRGB(110, 80, 180), ElementBorder = Color3.fromRGB(60, 40, 110),
+        DropdownHolder = Color3.fromRGB(34, 24, 66), ElementTransparency = 0.86,
+        Text = Color3.fromRGB(240, 240, 255), SubText = Color3.fromRGB(160, 158, 205), Hover = Color3.fromRGB(130, 100, 210),
+        AccentText = Color3.fromRGB(40, 10, 40), Info = Color3.fromRGB(1, 205, 254),
+    }),
+    Matcha = buildTheme({
+        -- chill light theme: milky matcha, warm paper
+        Name = "Matcha", Accent = Color3.fromRGB(108, 142, 88),
+        AcrylicMain = Color3.fromRGB(235, 238, 222), AcrylicBorder = Color3.fromRGB(180, 190, 160),
+        AcrylicGradient = ColorSequence.new(Color3.fromRGB(244, 246, 232), Color3.fromRGB(226, 232, 210)),
+        AcrylicNoise = 0.95, Element = Color3.fromRGB(205, 216, 182), ElementBorder = Color3.fromRGB(168, 182, 144),
+        DropdownHolder = Color3.fromRGB(228, 233, 214), ElementTransparency = 0.70,
+        Text = Color3.fromRGB(44, 52, 38), SubText = Color3.fromRGB(104, 114, 92), Hover = Color3.fromRGB(214, 224, 194),
+        AccentText = Color3.fromRGB(245, 248, 238),
+    }),
+    Ember = buildTheme({
+        -- cozy fireplace: dark coffee, amber glow
+        Name = "Ember", Accent = Color3.fromRGB(255, 156, 84),
+        AcrylicMain = Color3.fromRGB(32, 22, 18), AcrylicBorder = Color3.fromRGB(96, 62, 44),
+        AcrylicGradient = ColorSequence.new(Color3.fromRGB(38, 24, 18), Color3.fromRGB(58, 32, 22)),
+        AcrylicNoise = 0.90, Element = Color3.fromRGB(140, 88, 60), ElementBorder = Color3.fromRGB(74, 46, 34),
+        DropdownHolder = Color3.fromRGB(48, 32, 24), ElementTransparency = 0.86,
+        Text = Color3.fromRGB(246, 236, 226), SubText = Color3.fromRGB(180, 156, 140), Hover = Color3.fromRGB(168, 108, 76),
+        AccentText = Color3.fromRGB(44, 22, 10),
+    }),
+    Velvet = buildTheme({
+        -- deep wine velvet with champagne gold accent
+        Name = "Velvet", Accent = Color3.fromRGB(216, 180, 130),
+        AcrylicMain = Color3.fromRGB(30, 14, 22), AcrylicBorder = Color3.fromRGB(96, 48, 64),
+        AcrylicGradient = ColorSequence.new(Color3.fromRGB(36, 14, 26), Color3.fromRGB(52, 20, 34)),
+        AcrylicNoise = 0.92, Element = Color3.fromRGB(130, 66, 90), ElementBorder = Color3.fromRGB(72, 36, 50),
+        DropdownHolder = Color3.fromRGB(44, 22, 32), ElementTransparency = 0.86,
+        Text = Color3.fromRGB(244, 234, 236), SubText = Color3.fromRGB(180, 156, 164), Hover = Color3.fromRGB(158, 84, 110),
+        AccentText = Color3.fromRGB(40, 22, 12),
+    }),
 }
 
 Library.Theme = Library.Themes.Ocean
