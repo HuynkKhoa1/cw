@@ -3252,7 +3252,8 @@ function Library:CreateWindow(opts)
     end))
 
     local minimized = false
-    makeTopBtn(Library.Icons.close, -12, function() windowObj:Destroy() end, true)
+    -- X fully unloads the interface (window + status pill + reopen button + blur)
+    makeTopBtn(Library.Icons.close, -12, function() Library:Unload() end, true)
     makeTopBtn(Library.Icons.minimize, -44, function()
         minimized = not minimized
         if Library._openPopup then Library._openPopup() end
