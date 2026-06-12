@@ -1064,6 +1064,9 @@ function Library:LoadConfig(name, silent)
             if option then option:Set(value) else _flagStore[flag] = value end
         end
     end
+    -- refresh built-in Settings controls (Theme/Notif/etc live in __ui, not
+    -- __flags, so they aren't covered by the flag loop above)
+    if Library._syncSettingsControls then Library._syncSettingsControls() end
     if not silent then Library:Notify({ Title = "Config", Content = "Loaded '" .. name .. "'.", Type = "Success" }) end
     return true
 end
@@ -2013,7 +2016,8 @@ function Elements:Dropdown(opts)
         task.delay(aspeed(SPEED), function() animating = false end)
         Library._openDropdown = object
         Library._openPopup = function() object:Close() end
-        repoConn = RunService.RenderStepped:Connect(function()
+        -- reposition on layout changes only (no per-frame loop)
+        repoConn = frame:GetPropertyChangedSignal("AbsolutePosition"):Connect(function()
             object:_Reposition()
         end)
     end
@@ -3522,7 +3526,7 @@ function Library:CreateSettingsTab(window, configName)
     for name in pairs(Library.Themes) do table.insert(themeNames, name) end
     table.sort(themeNames)
 
-    tab:Dropdown({
+    local themeDrop = tab:Dropdown({
         Title = "Theme",
         Values = themeNames,
         Default = Library.CurrentThemeName,
@@ -3530,25 +3534,25 @@ function Library:CreateSettingsTab(window, configName)
         Callback = function(v) Library:SetTheme(v) end,
     })
 
-    tab:ColorPicker({
+    local accentPick = tab:ColorPicker({
         Title = "Accent Override",
         Default = accentColor(),
         Callback = function(c) Library:SetAccent(c) end,
     })
 
-    tab:Slider({
+    local cornerSlider = tab:Slider({
         Title = "Corner Radius",
         Min = 0, Max = 2, Decimals = 2, Default = Library._cornerScale,
         Callback = function(v) Library:SetCornerScale(v) end,
     })
 
-    tab:Slider({
+    local animSlider = tab:Slider({
         Title = "Animation Speed",
         Min = 0.25, Max = 2, Decimals = 2, Default = Library._animSpeed,
         Callback = function(v) Library:SetAnimationSpeed(v) end,
     })
 
-    tab:Toggle({
+    local blurToggle = tab:Toggle({
         Title = "Background Blur",
         Default = Library._blurEnabled,
         Callback = function(v) Library:EnableBlur(v) end,
@@ -3556,18 +3560,29 @@ function Library:CreateSettingsTab(window, configName)
 
     tab:Section({ Title = "Interface" })
 
-    tab:Keybind({
+    local toggleKeybind = tab:Keybind({
         Title = "Toggle UI Key",
         Default = Library.ToggleKey,
         OnChanged = function(k) Library.ToggleKey = k; if Library._queueSave then Library._queueSave() end end,
     })
 
-    tab:Dropdown({
+    local notifDrop = tab:Dropdown({
         Title = "Notification Position",
         Values = { "TopRight", "TopLeft", "BottomRight", "BottomLeft" },
         Default = Library.NotifPosition,
         Callback = function(v) Library:SetNotifPosition(v) end,
     })
+
+    -- keep visible Settings controls in sync with values applied by LoadConfig
+    Library._syncSettingsControls = function()
+        pcall(function() themeDrop:Set(Library.CurrentThemeName) end)
+        pcall(function() if Library._accentOverride then accentPick:Set(Library._accentOverride) end end)
+        pcall(function() cornerSlider:Set(Library._cornerScale, true) end)
+        pcall(function() animSlider:Set(Library._animSpeed, true) end)
+        pcall(function() blurToggle:Set(Library._blurEnabled) end)
+        pcall(function() notifDrop:Set(Library.NotifPosition) end)
+        pcall(function() toggleKeybind:Set(Library.ToggleKey) end)
+    end
 
     tab:Section({ Title = "Configuration" })
 
