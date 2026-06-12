@@ -1036,6 +1036,45 @@ function Library:AddTheme(name, theme)
     Library.Themes[name] = theme.AcrylicMain and buildTheme(theme) or theme
 end
 
+Library._iconPack = nil
+
+function Library:AddIcon(name, asset)
+    if name and asset then Library.Icons[name] = asset end
+end
+
+function Library:AddIcons(tbl)
+    if typeof(tbl) ~= "table" then return end
+    for k, v in pairs(tbl) do Library.Icons[k] = v end
+end
+
+function Library:LoadIconPack(source)
+    local pack = source
+    if typeof(source) == "string" then
+        local ok, res = pcall(function() return loadstring(game:HttpGet(source))() end)
+        if ok and typeof(res) == "table" then pack = res else return false end
+    end
+    if typeof(pack) == "table" then
+        Library._iconPack = pack
+        return true
+    end
+    return false
+end
+
+function Library:GetIcon(name)
+    if name == nil then return nil end
+    if typeof(name) ~= "string" then return name end
+    if name:match("^rbxassetid://") or name:match("^http") or name:match("^rbxasset://") then
+        return name
+    end
+    if Library.Icons[name] then return Library.Icons[name] end
+    local pack = Library._iconPack
+    if pack then
+        if pack[name] then return pack[name] end
+        if pack["lucide-" .. name] then return pack["lucide-" .. name] end
+    end
+    return nil
+end
+
 function Library:SetTheme(name)
     local theme = Library.Themes[name]
     if not theme then return end
@@ -2849,7 +2888,7 @@ function Library:CreateWindow(opts)
             Position = UDim2.new(0, 14, 0.5, 0),
             AnchorPoint = Vector2.new(0, 0.5),
             Size = UDim2.new(0, 20, 0, 20),
-            Image = Library.Icons[opts.Icon] or opts.Icon,
+            Image = Library:GetIcon(opts.Icon) or Library.Icons[opts.Icon] or opts.Icon,
             ImageColor3 = accentColor(),
             ZIndex = 6,
             Parent = topbar,
@@ -3157,7 +3196,7 @@ function Library:CreateWindow(opts)
                 Position = UDim2.new(0, 12, 0.5, 0),
                 AnchorPoint = Vector2.new(0, 0.5),
                 Size = UDim2.new(0, 16, 0, 16),
-                Image = Library.Icons[tabOpts.Icon] or tabOpts.Icon,
+                Image = Library:GetIcon(tabOpts.Icon) or Library.Icons[tabOpts.Icon] or tabOpts.Icon,
                 ImageColor3 = Library.Theme.SubText,
                 ZIndex = 5,
                 Parent = tabBtn,
