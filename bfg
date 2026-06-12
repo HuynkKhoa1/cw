@@ -1131,10 +1131,17 @@ function Library:Unload()
     if ScreenGui then ScreenGui:Destroy() end
 end
 
+Library._restoreCallbacks = {}
+
 function Library:SetVisible(state)
     Library._hidden = not state
     for _, w in ipairs(Library.Windows) do
         if w.Root then w.Root.Visible = state end
+    end
+    if state then
+        for _, restore in ipairs(Library._restoreCallbacks) do
+            pcall(restore)
+        end
     end
     if not state and Library._openPopup then
         Library._openPopup()
@@ -3118,6 +3125,15 @@ function Library:CreateWindow(opts)
             tween(root, SPEED, { Size = size })
             resizeHandle.Visible = true
             task.delay(aspeed(0.16), function() body.Visible = true end)
+        end
+    end)
+
+    table.insert(Library._restoreCallbacks, function()
+        if minimized then
+            minimized = false
+            root.Size = size
+            resizeHandle.Visible = true
+            body.Visible = true
         end
     end)
 
