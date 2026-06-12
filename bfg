@@ -32,6 +32,8 @@ local Library = {
     _animSpeed       = 1,
     _blurEnabled     = false,
     _activeBlur      = nil,
+    _seeThrough      = false,
+    _acrylicBgs      = {},
     NotifPosition    = "TopRight",
     _autoSaveEnabled = false,
     _autoSaveName    = nil,
@@ -443,7 +445,7 @@ local function acrylicGlass(parent, radius, zbase)
     local bg = new("Frame", {
         Name = "Background",
         BackgroundColor3 = Library.Theme.AcrylicMain,
-        BackgroundTransparency = 0.45,
+        BackgroundTransparency = Library._seeThrough and 0.78 or 0.45,
         Size = UDim2.fromScale(1, 1),
         BorderSizePixel = 0,
         ZIndex = zbase,
@@ -451,6 +453,7 @@ local function acrylicGlass(parent, radius, zbase)
     })
     corner(bg, radius)
     bindTheme(bg, function(t) return { BackgroundColor3 = t.AcrylicMain } end)
+    table.insert(Library._acrylicBgs, bg)
 
     local grad = new("Frame", {
         BackgroundColor3 = Color3.fromRGB(255, 255, 255),
@@ -1171,21 +1174,12 @@ end
 
 function Library:EnableBlur(enabled)
     Library._blurEnabled = enabled
+    Library._seeThrough = enabled and true or false
     if Library._queueSave then Library._queueSave() end
-    if enabled then
-        if not Library._activeBlur then
-            local blur = Instance.new("BlurEffect")
-            blur.Size = 0
-            blur.Parent = Lighting
-            Library._activeBlur = blur
-            tween(blur, 0.3, { Size = 14 })
-        end
-    else
-        if Library._activeBlur then
-            local b = Library._activeBlur
-            Library._activeBlur = nil
-            tween(b, 0.3, { Size = 0 })
-            task.delay(0.32, function() if b then b:Destroy() end end)
+    local target = enabled and 0.78 or 0.45
+    for _, bg in ipairs(Library._acrylicBgs) do
+        if bg and bg.Parent then
+            tween(bg, 0.25, { BackgroundTransparency = target })
         end
     end
 end
