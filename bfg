@@ -1928,6 +1928,50 @@ function Elements:Dropdown(opts)
         selected = opts.Default
     end
 
+    -- Optional per-option inline input (e.g. multi-farm "A=5, B=3, C=2"): every
+    -- SELECTED option row gets a small TextBox next to its checkmark, so no
+    -- separate "amount of A" elements are needed. Values are stored as strings
+    -- in a { [option] = "5" } table and saved under InlineInput.Flag.
+    --   InlineInput = { Flag, Default ("5" or {A="5"}), Placeholder, Numeric,
+    --                   Width (default 70), Callback(option, value, allValues) }
+    -- Read/write via object:GetInput(option?) / object:SetInput(option, value).
+    local inline = opts.InlineInput
+    local inlineFlag = inline and inline.Flag
+    local inlineWidth = inline and (inline.Width or 70)
+    local inlineStore = {}
+
+    local function inlineDefaultFor(option)
+        if not inline then return "" end
+        local d = inline.Default
+        if type(d) == "table" then
+            local v = d[option]
+            return v ~= nil and tostring(v) or ""
+        end
+        return d ~= nil and tostring(d) or ""
+    end
+
+    -- Numeric mode: accept only things tonumber understands; nil = reject input
+    local function sanitizeInline(text)
+        text = tostring(text or "")
+        if inline and inline.Numeric then
+            local num = tonumber(text)
+            if not num then return nil end
+            return tostring(num)
+        end
+        return text
+    end
+
+    if inline then
+        local stored = adoptFlag(inlineFlag, nil, "table")
+        if type(stored) == "table" then
+            for k, v in pairs(stored) do
+                if type(k) == "string" and (type(v) == "string" or type(v) == "number") then
+                    inlineStore[k] = tostring(v)
+                end
+            end
+        end
+    end
+
     local frame = elementBase(self.Page, 40)
     elemTitle(frame, opts.Title or "Dropdown", 150)
     register(self, frame, opts.Title)
@@ -1995,11 +2039,28 @@ function Elements:Dropdown(opts)
             b.label.TextColor3 = on and Library.Theme.AccentText or Library.Theme.SubText
             b.tick.ImageTransparency = on and 0 or 1
             b.tick.ImageColor3 = Library.Theme.AccentText
+            if b.input then
+                b.input.Visible = on and true or false
+                if not b.input:IsFocused() then
+                    b.input.Text = inlineStore[v] or inlineDefaultFor(v)
+                end
+            end
         end
         valueLabel.Text = labelText()
     end
 
+    -- A box still being typed in when the popup closes must not lose its text.
+    local function commitInlineInputs()
+        if not inline then return end
+        for v, b in pairs(optionButtons) do
+            if b.input and b.input:IsFocused() then
+                object:SetInput(v, b.input.Text)
+            end
+        end
+    end
+
     local function destroyPopup()
+        commitInlineInputs()
         if popup then popup:Destroy() popup = nil end
         optionButtons = {}
         listContainer = nil
@@ -2148,6 +2209,41 @@ function Elements:Dropdown(opts)
                 Parent = optFrame,
             })
             optionButtons[v] = { frame = optFrame, label = optLabel, tick = tick }
+
+            if inline then
+                -- room for: 10 left pad + label + 6 gap + input + 4 + tick(14) + 10
+                optLabel.Size = UDim2.new(1, -(44 + inlineWidth), 1, 0)
+                local inputBox = new("TextBox", {
+                    AnchorPoint = Vector2.new(1, 0.5),
+                    Position = UDim2.new(1, -28, 0.5, 0), -- tick occupies -10..-24
+                    Size = UDim2.new(0, inlineWidth, 0, 22),
+                    BackgroundColor3 = Library.Theme.Inset,
+                    Font = Library._font,
+                    Text = inlineStore[v] or inlineDefaultFor(v),
+                    PlaceholderText = inline.Placeholder or "",
+                    TextColor3 = Library.Theme.Text,
+                    PlaceholderColor3 = Library.Theme.SubText,
+                    TextSize = 12,
+                    ClearTextOnFocus = false,
+                    Visible = (multi and selected[v] or selected == v) and true or false,
+                    ZIndex = 610, -- above the row button so clicks focus the box, not toggle the option
+                    Parent = optFrame,
+                })
+                corner(inputBox, 6)
+                local inputStroke = stroke(inputBox, 0.6)
+                bindTheme(inputBox, function(t) return { BackgroundColor3 = t.Inset, TextColor3 = t.Text, PlaceholderColor3 = t.SubText } end)
+                bindTheme(inputStroke, function(t) return { Color = t.Stroke } end)
+                optionButtons[v].input = inputBox
+
+                track(inputBox.Focused:Connect(function()
+                    tween(inputStroke, 0.15, { Color = accentColor(), Transparency = 0.1 })
+                end))
+                track(inputBox.FocusLost:Connect(function()
+                    tween(inputStroke, 0.15, { Color = Library.Theme.Stroke, Transparency = 0.6 })
+                    object:SetInput(v, inputBox.Text)
+                end))
+            end
+
             track(optBtn.MouseEnter:Connect(function()
                 local on = multi and selected[v] or (selected == v)
                 if not on then tween(optFrame, 0.12, { BackgroundColor3 = Library.Theme.Hover }) end
@@ -2262,6 +2358,7 @@ function Elements:Dropdown(opts)
     function object:Close()
         if not open then return end
         open = false
+        commitInlineInputs()
         tween(arrow, SPEED, { Rotation = 90 })
         if repoConn then repoConn:Disconnect() repoConn = nil end
         if popup then
@@ -2318,6 +2415,55 @@ function Elements:Dropdown(opts)
     end
     function object:Get() return selected end
 
+    -- SetInput(option, value) writes one option's inline value (numeric-validated;
+    -- invalid input reverts). SetInput(tbl) bulk-replaces. GetInput(option) returns
+    -- that option's value (or its default); GetInput() returns { [option] = value }
+    -- for every option in the list that has a non-empty value.
+    function object:SetInput(option, value)
+        if not inline then return end
+        if type(option) == "table" and value == nil then
+            local fresh = {}
+            for k, v in pairs(option) do
+                if type(k) == "string" and (type(v) == "string" or type(v) == "number") then
+                    fresh[k] = tostring(v)
+                end
+            end
+            inlineStore = fresh
+            for v, b in pairs(optionButtons) do
+                if b.input and not b.input:IsFocused() then
+                    b.input.Text = inlineStore[v] or inlineDefaultFor(v)
+                end
+            end
+            if inlineFlag then Library.Flags[inlineFlag] = fresh end
+            return
+        end
+
+        local clean = sanitizeInline(value)
+        if clean == nil then clean = inlineStore[option] or inlineDefaultFor(option) end
+        inlineStore[option] = clean ~= "" and clean or nil
+        local b = optionButtons[option]
+        if b and b.input then b.input.Text = clean end
+        if inlineFlag then
+            local copy = {}
+            for k, v in pairs(inlineStore) do copy[k] = v end
+            Library.Flags[inlineFlag] = copy
+        end
+        if inline.Callback then task.spawn(inline.Callback, option, clean, object:GetInput()) end
+    end
+
+    function object:GetInput(option)
+        if not inline then return nil end
+        if option ~= nil then
+            return inlineStore[option] or inlineDefaultFor(option)
+        end
+        local out = {}
+        for _, v in ipairs(values) do
+            local val = inlineStore[v] or inlineDefaultFor(v)
+            if val ~= "" then out[v] = val end
+        end
+        return out
+    end
+
     function object:Refresh(newValues, keepSelection)
         values = newValues or values
         if not keepSelection then
@@ -2343,6 +2489,20 @@ function Elements:Dropdown(opts)
     end
 
     if flag then Library.Options[flag] = object end
+
+    -- The inline-input table is its own flag: register a tiny option object so
+    -- LoadConfig's option:Set(value) restores it through the normal pipeline.
+    if inline and inlineFlag then
+        local seedCopy = {}
+        for k, v in pairs(inlineStore) do seedCopy[k] = v end
+        seedFlag(inlineFlag, seedCopy)
+        Library.Options[inlineFlag] = {
+            Set = function(_, tbl)
+                if type(tbl) == "table" then object:SetInput(tbl) end
+            end,
+            Get = function() return object:GetInput() end,
+        }
+    end
     return object
 end
 
